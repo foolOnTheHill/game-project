@@ -1,4 +1,4 @@
-var height = Math.max(window.innerHeight-50, 650);
+var height = Math.min(window.innerHeight, 650);
 var width = Math.round(2.07*height);
 
 var scale = height / 650;
@@ -39,7 +39,7 @@ var main = {
     this.positions = [[this.game.world.width/2, this.game.world.height - 162, 1],
                       [this.game.world.width/2, this.game.world.height - 299, 1],
                       [this.game.world.width/2 + 350, this.game.world.height - 259, 0.7],
-                      [this.game.world.width/2 - 440, this.game.world.height - 339, 0.6]
+                      [this.game.world.width/2 - 425, this.game.world.height - 339, 0.6]
                     ];
 
     this.setPlatforms(this.positions);
@@ -90,7 +90,7 @@ var main = {
     this.enemiesHelly.createMultiple(50, 'Helly');
 
     this.setEnemyStatic(this.game.world.width/2 - 25, this.game.world.height - 390, this.enemiesTick);
-    this.setEnemyWalker(this.game.world.width/2, this.game.world.height -100, this.enemiesTeddy);
+    // this.setEnemyWalker(this.game.world.width/2, this.game.world.height -100, this.enemiesTeddy);
     this.setEnemyFlyer(20, this.game.world.height/2 - 110, 800, this.enemiesPlaney);
   },
   setFloor: function() {
@@ -134,7 +134,7 @@ var main = {
     var vy = this.player.body.velocity.y;
 
     if (this.cursors.left.isDown) {
-      this.player.body.velocity.x = -300;
+      this.player.body.velocity.x = -250;
 
       if (this.playerDirection == 'right') {
         this.player.scale.x *= -1;
@@ -143,7 +143,7 @@ var main = {
       this.playerDirection = 'left';
       this.player.animations.play('walk');
     } else if (this.cursors.right.isDown) {
-      this.player.body.velocity.x = 300;
+      this.player.body.velocity.x = 250;
 
       if (this.playerDirection == 'left') {
         this.player.scale.x *= -1;
@@ -151,7 +151,7 @@ var main = {
 
       this.playerDirection = 'right';
       this.player.animations.play('walk');
-    } else if (this.cursors.down.isDown) {
+    } else if (this.cursors.down.isDown && this.player.body.touching.down) {
       this.player.body.velocity.x = 0;
       this.player.animations.stop();
       this.player.frame = 6;
@@ -166,7 +166,7 @@ var main = {
       }
     }
 
-    if (this.jumpButton.isDown && this.player.body.touching.down && this.game.time.now > this.jumpTime) {
+    if (this.jumpButton.isDown && !this.cursors.down.isDown && this.player.body.touching.down && this.game.time.now > this.jumpTime) {
       this.player.body.velocity.y = -400;
       this.jumpTime = this.game.time.now + 800;
     }
@@ -175,17 +175,21 @@ var main = {
     var e = group.getFirstDead();
     if (e != null) {
       e.reset(x, y);
+
       this.game.physics.arcade.enable(e);
-      // e.body.immovable = true;
       e.body.collideWorldBounds = true;
+
+      e.animations.add('hit', [15, 16, 17, 18, 19], 8, false);
     }
   },
   setEnemyWalker: function(x, y, group) {
     var e = group.getFirstDead();
     if (e != null) {
       e.reset(x, y);
+
       e.animations.add('left', [0, 1, 2, 3, 4], 8, true);
       e.animations.add('right', [7, 8, 9, 10, 11], 8, true);
+      e.animations.add('hit', [14, 15, 16, 17, 18, 19], 8, false);
 
       this.game.physics.arcade.enable(e);
 
@@ -201,6 +205,7 @@ var main = {
       e.reset(x, y);
       e.animations.add('left', [0, 1], 10, true);
       e.animations.add('right', [2, 3], 10, true);
+      e.animations.add('hit', [4, 5, 6, 7, 8, 9], 8, false);
 
       this.game.physics.arcade.enable(e);
 
@@ -230,6 +235,7 @@ var main = {
     this.game.physics.arcade.overlap(this.player, this.enemiesTeddy, this.hitPlayer, null, this);
     this.game.physics.arcade.overlap(this.player, this.enemiesPlaney, this.hitPlayer, null, this);
     this.game.physics.arcade.overlap(this.player, this.enemiesHelly, this.hitPlayer, null, this);
+    this.game.physics.arcade.overlap(this.player, this.enemiesTick, this.hitPlayer, null, this);
     this.game.physics.arcade.overlap(this.player, this.coins, this.hitBomb, null, this);
 
     this.movePlayer();
@@ -238,9 +244,14 @@ var main = {
     this.enemiesTick.forEachAlive(this.updateEnemyStatic, this);
     this.enemiesTeddy.forEachAlive(this.updateEnemyWalker, this);
     this.enemiesPlaney.forEachAlive(this.updateEnemyFlyer, this);
+
+    if (this.enemiesTeddy.getFirstAlive() == null) {
+      this.setEnemyWalker(10, 20, this.enemiesTeddy);
+    }
   },
   hitPlayer: function(p, e) {
-    this.updatePlayerHp(1);
+    e.animations.play('hit', null, false, true);
+    // this.updatePlayerHp(1);
   },
   hitBomb: function(p, b) {
     b.kill();
@@ -250,10 +261,12 @@ var main = {
     bomb.kill();
   },
   updateEnemyStatic: function(e) {
-    if (this.player.x > e.x) {
-      e.frame = 7;
-    } else {
-      e.frame = 0;
+    if (e.animations.getAnimation('hit').isFinished) {
+        if (this.player.x > e.x) {
+          e.frame = 7;
+        } else {
+          e.frame = 0;
+        }
     }
   },
   updateEnemyWalker: function(t) {

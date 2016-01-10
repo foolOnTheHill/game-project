@@ -7,12 +7,14 @@ var Bullet = function (game, sprite, damage) {
 
     this.game.add.existing(this);
     this.body.allowGravity = false;
-    
+
     this.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
 
     this.checkWorldBounds = true;
     this.outOfBoundsKill = true;
     this.exists = false;
+
+    this.animations.add('fly', [0, 1, 2, 3], 12, true);
 
     //this.tracking = false;
     //this.scaleSpeed = 0;
@@ -26,7 +28,9 @@ Bullet.prototype.fire = function (x, y, angle, speed, dir) {
     this.reset(x + offset*dir, y);
     this.body.velocity.x = speed * dir;
     this.scale.set(1);
-    
+
+    this.animations.play('fly');
+
     //this.game.physics.arcade.velocityFromAngle(angle, speed, this.body.velocity);
 
     //this.angle = angle;
@@ -60,7 +64,7 @@ Weapon.Basic.prototype.fire = function (source, dir) {
 	if (this.game.time.time < this.nextFire) { return; }
 
     var x = source.x + 10;
-    var y = source.y - 30;
+    var y = source.y - 50;
 
     if (this.bullets > 0) {
 		this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, dir);

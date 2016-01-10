@@ -1,4 +1,4 @@
-var EnemyWalker = function(x, y, game, sprite) {
+var EnemyWalker = function(x, y, game, sprite, hp) {
 	Phaser.Sprite.call(this, game, x, y, sprite);
 
 	this.game.physics.arcade.enable(this);
@@ -11,7 +11,9 @@ var EnemyWalker = function(x, y, game, sprite) {
 
 	this.animations.play("right");
 
-	this.hp = 5;
+	this.hp = hp;
+
+	this.tookHit = false;
 };
 
 EnemyWalker.prototype = Object.create(Phaser.Sprite.prototype);
@@ -26,23 +28,31 @@ EnemyWalker.prototype.damage = function(value) {
 	if (this.hp <= 0) {
 		this.kill();
 	}
-	
+	this.tookHit = true;
 	console.log(this.hp);
 };
 
 EnemyWalker.prototype.move = function() {
-	if (this.body.x == 0) {
-		this.body.velocity.x = 200;
-		this.animations.play('right');
-	} else if (this.game.world.width - this.body.x == this.width) {
-		this.body.velocity.x = -200;
-		this.animations.play('left');
-	} else if (this.body.velocity.x == 0) {
-		this.body.velocity.x = 200;
-		this.animations.play('right');
+	if (!this.tookHit || this.animations.getAnimation('hit').isFinished) {
+		if (this.body.x == 0) {
+			this.body.velocity.x = 200;
+			this.animations.play('right');
+		} else if (this.game.world.width - this.body.x == this.width) {
+			this.body.velocity.x = -200;
+			this.animations.play('left');
+		} else if (this.body.velocity.x == 0) {
+			this.body.velocity.x = 200;
+			this.animations.play('right');
+		}
+
+		this.tookHit = false;
+		this.animations.getAnimation('hit').isFinished = false;
+		if (this.body.velocity.x > 0) {
+			this.animations.play('right');
+		} else {
+			this.animations.play('left');
+		}
+	} else {
+		this.animations.play('hit');
 	}
 };
-
-
-
-

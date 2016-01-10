@@ -27,4 +27,3 @@ Enemy.prototype.damage = function(value) {
 
 	console.log(this.hp);
 };
-

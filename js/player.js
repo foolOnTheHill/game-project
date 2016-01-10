@@ -1,7 +1,7 @@
-var Player = function(x, y, game, sprite, scale) {
+var Player = function(x, y, game, sprite, scale, hp) {
 	Phaser.Sprite.call(this, game, x, y, sprite);
-    
-    this.frame = 0;
+
+  this.frame = 0;
 	this.animations.add('walk', [1, 2, 3], 8, true);
 
 	this.anchor.setTo(0.5, 1);
@@ -13,18 +13,24 @@ var Player = function(x, y, game, sprite, scale) {
 	this.body.collideWorldBounds = true;
 
 	this.playerDirection = 'left';
-	
-    this.direction = 1;
-    this.HP = 5;
-    this.weapon1;
-    this.weapon2;
-    this.currentWeapon;
-    
-    this.HPText = this.game.add.text(75 * scale, 45 * scale, 'HP: ' + this.HP, {
+
+  this.direction = 1;
+  this.HP = hp;
+	this.MAX_HP = 5;
+  this.weapon1;
+  this.weapon2;
+  this.currentWeapon;
+
+  this.HPText = this.game.add.text(75 * scale, 45 * scale, 'HP: ' + this.HP, {
 		font : (45 * scale) + 'px "Arial"',
 		fill : '#FFFFFF'
 	});
-	
+
+	this.tookHit = false;
+	this.hitFlashTime = null;
+
+	this.downHit = false;
+
 	this.updateHPText();
 };
 
@@ -33,16 +39,17 @@ Player.prototype.constructor = Player;
 
 
 Player.prototype.damage = function(value) {
-	console.log("test");
-	this.HP -= value;
-	
-	this.updateHPText();
-	console.log("Player HP: " +  this.HP);
+	if (!this.tookHit) {
+		this.HP -= value;
+		this.tint = 0xec5656;
+		this.tookHit = true;
+		this.hitFlashTime = this.game.time.now + 1200;
+		this.updateHPText();
+	}
 };
 
 Player.prototype.fire = function() {
 	//Shooting Animation here!!
-		
 	this.currentWeapon.fire(this, this.direction);
 };
 
@@ -61,7 +68,21 @@ Player.prototype.updateHPText = function() {
 
 
 Player.prototype.update = function() {
-	//console.log(this.playerDirection);
+	if (this.tookHit) {
+		if (this.game.time.now >= this.hitFlashTime) {
+			this.tint = 0xffffff;
+			this.tookHit = false;
+		}
+	}
 };
 
+Player.prototype.recover = function(r) {
+	this.HP = Math.max(this.MAX_HP, this.HP + r);
+	this.updateHPText();
+};
 
+Player.prototype.upgradeHp = function() {
+	this.MAX_HP += 1;
+	this.HP = this.MAX_HP;
+	this.updateHPText();
+};

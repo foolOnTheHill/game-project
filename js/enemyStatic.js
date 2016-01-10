@@ -1,4 +1,4 @@
-var EnemyStatic = function(x, y, game, sprite) {
+var EnemyStatic = function(x, y, game, sprite, hp) {
 	Phaser.Sprite.call(this, game, x, y, sprite);
 
 	this.game.physics.arcade.enable(this);
@@ -7,7 +7,9 @@ var EnemyStatic = function(x, y, game, sprite) {
 
 	this.animations.add('hit', [15, 16, 17, 18, 19], 8, false);
 
-	this.hp = 5;
+	this.tookHit = false;
+
+	this.hp = hp;
 };
 
 EnemyStatic.prototype = Object.create(Phaser.Sprite.prototype);
@@ -19,6 +21,8 @@ EnemyStatic.prototype.update = function() {
 
 EnemyStatic.prototype.damage = function(value) {
 	this.hp -= value;
+
+	this.tookHit = true;
 	if (this.hp <= 0) {
 		this.kill();
 	}
@@ -26,15 +30,18 @@ EnemyStatic.prototype.damage = function(value) {
 	console.log(this.hp);
 };
 
-EnemyStatic.prototype.updateDirection = function(player) {
+EnemyStatic.prototype.updateDirection = function() {
 	//console.log("# " + main.player.x + "    " + this.x);
-		
-	if (this.animations.getAnimation('hit').isFinished) {
+
+	if (!this.tookHit || this.animations.getAnimation('hit').isFinished) {
 		if (main.player.x > this.x) {
 			this.frame = 7;
 		} else {
 			this.frame = 0;
 		}
+		this.tookHit = false;
+		this.animations.getAnimation('hit').isFinished = false;
+	} else {
+		this.animations.play('hit');
 	}
 };
-

@@ -1,8 +1,7 @@
-var Platform = function(x, y, width, movement, fall) {
+var Platform = function(x, y, width, fall) {
   this.x = x;
   this.y = y;
   this.width = width;
-  this.movement = movement;
   this.fall = fall;
 };
 
@@ -19,17 +18,18 @@ var Item = function(x, y, type) {
   this.type = type;
   this.x = x;
   this.y = y;
-}
-
-var Exit = function(x, y) {
-  this.x = x;
-  this.y = y;
 };
 
-var Level = function(platformsList, enemiesList, starList, itensList, exitPosition) {
+var Exit = function(x, y, scale) {
+  this.x = x;
+  this.y = y;
+  this.scale = scale;
+};
+
+var Level = function(platformsList, enemiesList, starList, itensList, exit) {
   this.platformsList = platformsList;
   this.enemiesList = enemiesList;
-  this.starList = starList;
+  this.starsList = starList;
   this.itensList = itensList;
-  this.exitPosition = exitPosition;
+  this.exit = exit;
 };

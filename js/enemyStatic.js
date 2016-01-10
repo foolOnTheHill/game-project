@@ -5,7 +5,11 @@ var EnemyStatic = function(x, y, game, sprite, hp) {
 	this.game.add.existing(this);
 	this.body.collideWorldBounds = true;
 
-	this.animations.add('hit', [15, 16, 17, 18, 19], 8, false);
+	try {
+		this.animations.add('hit', [15, 16, 17, 18, 19], 8, false);
+	} catch(e) {
+		this.animations.add('hit', [0, 1], 8, false);
+	}
 
 	this.tookHit = false;
 

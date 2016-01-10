@@ -1,3 +1,5 @@
+"use strict";
+
 var height = Math.min(window.innerHeight, 650);
 var width = Math.round(2.07 * height);
 
@@ -14,6 +16,8 @@ var main = {
 
 		this.game.load.spritesheet('Danny', 'assets/Danny70x70.png', 70, 70);
 		this.game.load.spritesheet('Jessie', 'assets/Jessie70x70.png', 70, 70);
+
+		this.game.load.spritesheet('Lucas', 'assets/Lucas75x55.png', 55, 75);
 
 		this.game.load.spritesheet('Coin', 'assets/Money24x25.png', 25, 24);
 
@@ -51,11 +55,13 @@ var main = {
 		//PLATAFORMS
 		this.platforms = this.game.add.group();
 		this.platforms.createMultiple(550, 'platform');
-		this.positions = [[this.game.world.width / 2, this.game.world.height - 162, 1], [this.game.world.width / 2, this.game.world.height - 299, 1], [this.game.world.width / 2 + 350, this.game.world.height - 259, 0.7], [this.game.world.width / 2 - 425, this.game.world.height - 339, 0.6]];
-		this.setPlatforms(this.positions);
 
+		// STARS
+		this.stars = this.game.add.group();
+		this.stars.createMultiple(100, 'Coin');
+
+		// WEAPONS
 		this.weapons = [];
-
 		this.weapons.push(new Weapon.Basic(this.game, 'bullet'));
 		this.weapons.push(new Weapon.Cannon(this.game, 'bullet'));
 
@@ -72,28 +78,39 @@ var main = {
 		this.cursors = this.game.input.keyboard.createCursorKeys();
 		this.fireButton = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
 		this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.S);
-		changeWeaponButton = game.input.keyboard.addKey(Phaser.Keyboard.W);
-		changeWeaponButton.onDown.add(this.changeWeapon, this);
-
-		//ENEMIES
-		this.enemiesTick = this.game.add.group();
-		this.enemyTick = new EnemyShooter(this.game.world.width / 2 - 25, this.game.world.height - 390, this.game, 'Tick', 2, 800);
-		this.enemiesTick.add(this.enemyTick);
-
-		this.enemiesTeddy = this.game.add.group();
-		var enemyTeddy = new EnemyWalker(this.game.world.width / 2, this.game.world.height - 100, this.game, 'BrownTeddy', 5);
-		this.enemiesTeddy.add(enemyTeddy);
-
-		enemyTeddy = new EnemyWalker(200, this.game.world.height - 100, this.game, 'BrownTeddy', 5);
-		this.enemiesTeddy.add(enemyTeddy);
-
-		this.enemiesPlaney = this.game.add.group();
-		var enemyPlaney = new EnemyFlyer(20, this.game.world.height / 2 - 110, this.game, 'Helly', 5, true, 800, /*[0, 1], [2, 3],*/[0, 1], [8, 9], [16, 17, 18, 19, 20]);//[4, 5, 6, 7, 8, 9]);
-		this.enemiesPlaney.add(enemyPlaney);
+		this.changeWeaponButton = game.input.keyboard.addKey(Phaser.Keyboard.W);
+		this.changeWeaponButton.onDown.add(this.changeWeapon, this);
 
 		//BOMBS
 		this.bombs = this.game.add.group();
 		this.bombs.createMultiple(1000, 'bomb');
+
+		// ENEMIES
+		this.enemies = this.game.add.group();
+
+		// EXIT
+		this.exit = new EnemyStatic(0, 0, this.game, 'Lucas', 0);
+
+		// LEVEL
+		var Tick = new EnemyShooter(this.game.world.width / 2 - 25, this.game.world.height - 390, this.game, 'Tick', 2, 800);
+		var Teddy = new EnemyWalker(this.game.world.width / 2, this.game.world.height - 100, this.game, 'BrownTeddy', 5);
+		var Helly = new EnemyFlyer(20, this.game.world.height / 2 - 110, this.game, 'Helly', 5, false, 800, /*[0, 1], [2, 3],*/[0, 1], [8, 9], [16, 17, 18, 19, 20]);//[4, 5, 6, 7, 8, 9]);
+		var enemiesList = [Tick, Teddy, Helly];
+
+		var p1 = new Platform(this.game.world.width / 2, this.game.world.height - 162, 1, false);
+		var p2 = new Platform(this.game.world.width / 2, this.game.world.height - 299, 1, false);
+		var p3 = new Platform(this.game.world.width / 2 + 350, this.game.world.height - 259, 0.7, false);
+		var p4 = new Platform(this.game.world.width / 2 - 425, this.game.world.height - 339, 0.6, false);
+		var platformsList = [p1, p2, p3, p4];
+
+		var star1 = new Star(10, 10);
+		var starsList = [star1];
+
+		var exit = new Exit(this.game.world.width / 2 - 445, this.game.world.height - 469, -1);
+
+		var level = new Level(platformsList, enemiesList, starsList, [], exit);
+
+		this.loadLevel(level);
 
 		//
 		this.bulletTime = this.game.time.now + 200;
@@ -201,13 +218,18 @@ var main = {
 
 	collisions : function() {
 		//MAP - UNITS
-		this.game.physics.arcade.collide(this.platforms, this.enemiesTick);
-		this.game.physics.arcade.collide(this.floor, this.enemiesTick);
+		this.game.physics.arcade.collide(this.platforms, this.enemies);
+		this.game.physics.arcade.collide(this.floor, this.enemies);
 
-		this.game.physics.arcade.collide(this.platforms, this.enemiesTeddy);
-		this.game.physics.arcade.collide(this.floor, this.enemiesTeddy);
+		this.game.physics.arcade.collide(this.exit, this.platforms);
+		this.game.physics.arcade.collide(this.exit, this.floor);
 
-		this.game.physics.arcade.collide(this.platforms, this.player, null, null, this);
+		this.game.physics.arcade.collide(this.platforms, this.player, function(player, plt){
+			if (plt.fall && (player.y < plt.y) && (player.x > plt.x - plt.width/2) && (player.x < plt.x + plt.width/2)) {
+				plt.body.immovable = false;
+				plt.body.velocity.y = 100;
+			}
+		}, null, this);
 		this.game.physics.arcade.collide(this.floor, this.player, null, null, this);
 
 		//BULLETS - MAP
@@ -218,15 +240,11 @@ var main = {
 		this.game.physics.arcade.collide(this.player.currentWeapon, this.floor, this.killBullet, null, this);
 
 		//BULLETS - ENEMIES
-		game.physics.arcade.overlap(this.player.currentWeapon, this.enemiesTick, this.hitEnemy, null, this);
-		game.physics.arcade.overlap(this.player.currentWeapon, this.enemiesTeddy, this.hitEnemy, null, this);
-		game.physics.arcade.overlap(this.player.currentWeapon, this.enemiesPlaney, this.hitEnemy, null, this);
+		game.physics.arcade.overlap(this.player.currentWeapon, this.enemies, this.hitEnemy, null, this);
 
 		//PLAYER
 		this.game.physics.arcade.overlap(this.player, this.bombs, this.hitBomb, null, this);
-		this.game.physics.arcade.overlap(this.player, this.enemiesTick, this.hitPlayer, null, this);
-		this.game.physics.arcade.overlap(this.player, this.enemiesTeddy, this.hitPlayer, null, this);
-		this.game.physics.arcade.overlap(this.player, this.enemiesPlaney, this.hitPlayer, null, this);
+		this.game.physics.arcade.overlap(this.player, this.enemies, this.hitPlayer, null, this);
 	},
 
 	changeWeapon : function() {
@@ -236,6 +254,15 @@ var main = {
 	hitPlayer : function(player, enemy) {
 		if ((!player.downHit && player.y  > enemy.y) || (player.downHit && enemy.y + enemy.height >= player.y - player.height/2)) {
 			enemy.damage(0);
+			this.player.animations.play('hit', null, false, true);
+			this.player.damage(1);
+			this.checkGameOver();
+		}
+	},
+
+	bulletHitPlayer : function(player, enemy) {
+		if ((!player.downHit && player.y  > enemy.y) || (player.downHit && enemy.y + enemy.height >= player.y - player.height/2)) {
+			enemy.kill();
 			this.player.animations.play('hit', null, false, true);
 			this.player.damage(1);
 			this.checkGameOver();
@@ -276,6 +303,52 @@ var main = {
 
 	restart : function() {
 		this.game.state.restart();
+	},
+
+	loadLevel: function(level) {
+		this.loadPlatforms(level.platformsList);
+		this.loadEnemies(level.enemiesList);
+
+		this.exit.reset(level.exit.x, level.exit.y);
+		this.exit.anchor.setTo(0.5, 1);
+		this.exit.scale.x = level.exit.scale;
+	},
+
+	loadPlatforms: function(platformsList) {
+		for(var i = 0; i < platformsList.length; i++) {
+			var plt = platformsList[i];
+			var p = this.platforms.getFirstDead();
+			if (p != null) {
+				p.reset(plt.x, plt.y);
+				p.anchor.setTo(0.5, 0.5);
+				p.width *= plt.width;
+				this.game.physics.arcade.enable(p);
+				p.body.immovable = true;
+				p.body.allowGravity = false;
+				p.body.collideWorldBounds = true;
+				p.fall = plt.fall;
+			}
+		}
+	},
+
+	loadEnemies: function(enemiesList) {
+		for (var i = 0; i < enemiesList.length; i++) {
+			this.enemies.add(enemiesList[i]);
+		}
+	},
+
+	loadStars: function(starsList) {
+		for (var i = 0; i < starsList.length; i++) {
+			var st = starsList[i];
+			var s = this.stars.getFirstDead();
+			if (s != null) {
+				s.reset(st.x, st.y);
+				s.animations.add('move', [0, 1, 2, 3], 8, true);
+				this.game.physics.arcade.enable(s);
+				s.body.allowGravity = true;
+				s.animations.play('move');
+			}
+		}
 	}
 };
 

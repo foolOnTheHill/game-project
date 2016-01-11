@@ -35,6 +35,10 @@ var main = {
 		this.game.load.image('enemy', 'assets/test/enemy.png');
 
 		this.game.load.spritesheet('explosion', 'assets/explosion.png', 64, 64);
+
+		this.game.load.image('heart_empty', 'assets/UI/UI_HEART_EMPTY.png');
+		this.game.load.image('heart_half', 'assets//UI/UI_HEART_HALF.png');
+		this.game.load.image('heart_full', 'assets/UI/UI_HEART_FULL.png');
 	},
 
 	create : function() {

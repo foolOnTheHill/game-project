@@ -1,7 +1,7 @@
 var Player = function(x, y, game, sprite, scale, hp) {
 	Phaser.Sprite.call(this, game, x, y, sprite);
 
-  this.frame = 0;
+	this.frame = 0;
 	this.animations.add('walk', [1, 2, 3], 8, true);
 
 	this.anchor.setTo(0.5, 1);
@@ -14,24 +14,26 @@ var Player = function(x, y, game, sprite, scale, hp) {
 
 	this.playerDirection = 'left';
 
-  this.direction = 1;
-  this.HP = hp;
-	this.MAX_HP = 5;
-  this.weapon1;
-  this.weapon2;
-  this.currentWeapon;
+	this.direction = 1;
+	this.HP = hp;
+	this.MAX_HP = 6;
+	this.weapon1;
+	this.weapon2;
+	this.currentWeapon;
 
-  this.HPText = this.game.add.text(75 * scale, 45 * scale, 'HP: ' + this.HP, {
+	/*this.HPText = this.game.add.text(75 * scale, 45 * scale, 'HP: ' + this.HP, {
 		font : (45 * scale) + 'px "Arial"',
 		fill : '#FFFFFF'
-	});
+	});*/
 
 	this.tookHit = false;
 	this.hitFlashTime = null;
 
 	this.downHit = false;
 
-	this.updateHPText();
+	this.heartSprites = [];
+
+	this.createHearts();
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -44,7 +46,7 @@ Player.prototype.damage = function(value) {
 		this.tint = 0xec5656;
 		this.tookHit = true;
 		this.hitFlashTime = this.game.time.now + 1200;
-		this.updateHPText();
+		this.updateHearts();
 	}
 };
 
@@ -82,7 +84,53 @@ Player.prototype.recover = function(r) {
 };
 
 Player.prototype.upgradeHp = function() {
-	this.MAX_HP += 1;
+	this.MAX_HP += 2;
 	this.HP = this.MAX_HP;
-	this.updateHPText();
+	
+	var n = this.MAX_HP / 2 - 1;
+	this.heartSprites[n] = this.game.add.sprite(5 + n * 40, 5, 'heart_full');
+	this.heartSprites[n].scale.setTo(0.25, 0.25);
+	
+	this.updateHearts();
+};
+
+
+Player.prototype.createHearts = function() {
+	var numberHearts = Math.ceil(this.MAX_HP / 2);
+	
+	for (var i = 0; i < numberHearts; i++) {
+		this.heartSprites[i] = this.game.add.sprite(5 + i * 40, 5, 'heart_full');
+		this.heartSprites[i].scale.setTo(0.25, 0.25);
+	}
+	
+	this.updateHearts();
+
+};
+
+Player.prototype.updateHearts = function() {
+	
+	var numberHearts = Math.ceil(this.MAX_HP / 2);
+	
+	var h = this.HP % 2;
+	var e = Math.floor((this.MAX_HP - this.HP) / 2);
+	var f = (numberHearts - h - e);
+	
+	var index = 0;
+	var sprite;
+	
+	for (var i = 0; i < f; i++) {
+		this.heartSprites[index].loadTexture('heart_full');
+		index++;
+	}
+	
+	if (h == 1) {
+		this.heartSprites[index].loadTexture('heart_half');
+		index++;
+	}
+	
+	for (var i = 0; i < e; i++) {
+		this.heartSprites[index].loadTexture('heart_empty');
+		index++;
+	}
+
 };

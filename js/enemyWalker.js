@@ -10,6 +10,7 @@ var EnemyWalker = function(x, y, game, sprite, hp) {
 	this.animations.add('hit', [14, 15, 16, 17, 18, 19], 8, false);
 
 	this.animations.play("right");
+	this.direction = 'right';
 
 	this.hp = hp;
 
@@ -37,20 +38,25 @@ EnemyWalker.prototype.move = function() {
 		if (this.body.x == 0) {
 			this.body.velocity.x = 200;
 			this.animations.play('right');
+			this.direction = 'right';
 		} else if (this.game.world.width - this.body.x == this.width) {
 			this.body.velocity.x = -200;
 			this.animations.play('left');
+			this.direction = 'left';
 		} else if (this.body.velocity.x == 0) {
 			this.body.velocity.x = 200;
 			this.animations.play('right');
+			this.direction = 'right';
 		}
 
 		this.tookHit = false;
 		this.animations.getAnimation('hit').isFinished = false;
 		if (this.body.velocity.x > 0) {
 			this.animations.play('right');
+			this.direction = 'right';
 		} else {
 			this.animations.play('left');
+			this.direction = 'left';
 		}
 	} else {
 		this.animations.play('hit');

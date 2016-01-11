@@ -12,6 +12,7 @@ var EnemyStatic = function(x, y, game, sprite, hp) {
 	}
 
 	this.tookHit = false;
+	this.direction = 'left';
 
 	this.hp = hp;
 };
@@ -40,8 +41,10 @@ EnemyStatic.prototype.updateDirection = function() {
 	if (!this.tookHit || this.animations.getAnimation('hit').isFinished) {
 		if (main.player.x > this.x) {
 			this.frame = 7;
+			this.direction = 'right';
 		} else {
 			this.frame = 0;
+			this.direction = 'left';
 		}
 		this.tookHit = false;
 		this.animations.getAnimation('hit').isFinished = false;

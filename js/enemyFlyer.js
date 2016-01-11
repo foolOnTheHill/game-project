@@ -11,6 +11,7 @@ var EnemyFlyer = function(x, y, game, sprite, hp, isDropper, dropPeriod, leftAni
 	this.animations.add('hit', hitAnimation, 8, false);
 
 	this.animations.play("right");
+	this.direction = 'right';
 
 	this.body.velocity.x = 250;
 	this.isDropper = isDropper;
@@ -42,12 +43,15 @@ EnemyFlyer.prototype.move = function() {
 		if (this.body.x == 0) {
 			this.body.velocity.x = 200;
 			this.animations.play('right');
+			this.direction = 'right';
 		} else if (this.game.world.width - this.body.x == this.width) {
 			this.body.velocity.x = -200;
 			this.animations.play('left');
+			this.direction = 'left';
 		} else if (this.body.velocity.x == 0) {
 			this.body.velocity.x = 200;
 			this.animations.play('right');
+			this.direction = 'right';
 		}
 
 		if (this.isDropper && this.game.time.now > this.dropTime && this.alive) {
@@ -65,8 +69,10 @@ EnemyFlyer.prototype.move = function() {
 		this.animations.getAnimation('hit').isFinished = false;
 		if (this.body.velocity.x > 0) {
 			this.animations.play('right');
+			this.direction = 'right';
 		} else {
 			this.animations.play('left');
+			this.direction = 'left';
 		}
 	} else {
 		this.animations.play('hit');

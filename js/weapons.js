@@ -24,8 +24,9 @@ Bullet.prototype = Object.create(Phaser.Sprite.prototype);
 Bullet.prototype.constructor = Bullet;
 
 Bullet.prototype.fire = function (x, y, angle, speed, dir) {
-	var offset = 22;
-    this.reset(x + offset*dir, y);
+	
+    this.reset(x, y);
+    
     this.body.velocity.x = speed * dir;
     this.scale.set(1);
 
@@ -61,12 +62,12 @@ Weapon.Basic.prototype = Object.create(Phaser.Group.prototype);
 Weapon.Basic.prototype.constructor = Weapon.Basic;
 
 Weapon.Basic.prototype.fire = function (source, dir) {
-	//console.log(this.bullets);
 	if (this.game.time.time < this.nextFire) { return; }
 
-    var x = source.x + 10;
+	var offset = 20 - (dir * 40);
+    var x = source.x - offset;
     var y = source.y - 50;
-
+    
     if (this.bullets > 0) {
 		this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, dir);
     	this.nextFire = this.game.time.time + this.fireRate;

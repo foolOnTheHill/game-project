@@ -25,6 +25,8 @@ EnemyShooter.prototype.constructor = Enemy;
 EnemyShooter.prototype.update = function() {
 	if (this.alive) {
 		this.game.physics.arcade.overlap(main.player, this.bullets, main.bulletHitPlayer, null, main);
+		this.game.physics.arcade.overlap(this.bullets, main.platforms, main.killBullet, null, this);
+		this.game.physics.arcade.overlap(this.bullets, main.floor, main.killBullet, null, this);
 
 		this.updateDirection();
 		this.shoot();
@@ -71,10 +73,10 @@ EnemyShooter.prototype.shoot = function() {
 			b.outOfBoundsKill = true;
 
 			if (this.direction == 'left') {
-				b.reset(this.x - this.width, this.y + this.width/4);
+				b.reset(this.x - this.width + 30, this.y + this.width/4 + 5);
 				b.body.velocity.x = -300;
 			} else {
-				b.reset(this.x + this.width, this.y + this.width/4);
+				b.reset(this.x + this.width, this.y + this.width/4 + 5);
 				b.body.velocity.x = 300;
 			}
 		}

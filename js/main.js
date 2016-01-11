@@ -21,10 +21,11 @@ var main = {
 
 		this.game.load.spritesheet('Coin', 'assets/Money24x25.png', 25, 24);
 
-		this.game.load.image('platform', 'assets/platform.png');
+		this.game.load.image('platform', 'assets/platformTest.png');
 		//this.game.load.image('bullet', 'assets/bullet.png');
 
 		this.game.load.image('sky', 'assets/test/sky.png');
+		this.game.load.image('shopbackground', 'assets/ShopBackground.jpg');
 		this.game.load.image('ground', 'assets/test/platform.png');
 
 		this.game.load.spritesheet('bullet', 'assets/Apples30x30.png', 30, 30);
@@ -97,7 +98,7 @@ var main = {
 		this.exit = new EnemyStatic(0, 0, this.game, 'Lucas', 0);
 
 		// LEVEL
-		var Tick = new EnemyShooter(this.game.world.width / 2 - 25, this.game.world.height - 390, this.game, 'Tick', 2, 800);
+		var Tick = new EnemyShooter(this.game.world.width / 2 - 25, this.game.world.height - 390, this.game, 'Tick', 2, 2000);
 		var Teddy = new EnemyWalker(this.game.world.width / 2, this.game.world.height - 100, this.game, 'BrownTeddy', 5);
 		var Helly = new EnemyFlyer(20, this.game.world.height / 2 - 190, this.game, 'Helly', 5, false, 800, /*[0, 1], [2, 3],*/[0, 1], [8, 9], [16, 17, 18, 19, 20]);//[4, 5, 6, 7, 8, 9]);
 		var enemiesList = [Tick, Teddy, Helly];
@@ -242,11 +243,11 @@ var main = {
 		this.game.physics.arcade.collide(this.floor, this.player, null, null, this);
 
 		//BULLETS - MAP
-		this.game.physics.arcade.collide(this.bombs, this.platforms, this.explodeBomb, null, this);
-		this.game.physics.arcade.collide(this.bombs, this.floor, this.explodeBomb, null, this);
+		this.game.physics.arcade.overlap(this.bombs, this.platforms, this.explodeBomb, null, this);
+		this.game.physics.arcade.overlap(this.bombs, this.floor, this.explodeBomb, null, this);
 
-		this.game.physics.arcade.collide(this.player.currentWeapon, this.platforms, this.killBullet, null, this);
-		this.game.physics.arcade.collide(this.player.currentWeapon, this.floor, this.killBullet, null, this);
+		this.game.physics.arcade.overlap(this.player.currentWeapon, this.platforms, this.killBullet, null, this);
+		this.game.physics.arcade.overlap(this.player.currentWeapon, this.floor, this.killBullet, null, this);
 
 		//BULLETS - ENEMIES
 		game.physics.arcade.overlap(this.player.currentWeapon, this.enemies, this.hitEnemy, null, this);

@@ -7,7 +7,8 @@ var EnemyWalker = function(x, y, game, sprite, hp) {
 
 	this.animations.add('left', [0, 1, 2, 3, 4], 8, true);
 	this.animations.add('right', [7, 8, 9, 10, 11], 8, true);
-	this.animations.add('hit', [14, 15, 16, 17, 18, 19], 8, false);
+	this.animations.add('lhit', [14], 8, false);
+	this.animations.add('rhit', [14], 8, false); //Mudar animação
 
 	this.animations.play("right");
 	this.direction = 'right';
@@ -34,7 +35,7 @@ EnemyWalker.prototype.damage = function(value) {
 };
 
 EnemyWalker.prototype.move = function() {
-	if (!this.tookHit || this.animations.getAnimation('hit').isFinished) {
+	if (!this.tookHit || this.animations.getAnimation('lhit').isFinished || this.animations.getAnimation('rhit').isFinished) {
 		if (this.body.x == 0) {
 			this.body.velocity.x = 200;
 			this.animations.play('right');
@@ -50,7 +51,8 @@ EnemyWalker.prototype.move = function() {
 		}
 
 		this.tookHit = false;
-		this.animations.getAnimation('hit').isFinished = false;
+		this.animations.getAnimation('lhit').isFinished = false;
+		this.animations.getAnimation('rhit').isFinished = false;
 		if (this.body.velocity.x > 0) {
 			this.animations.play('right');
 			this.direction = 'right';
@@ -59,6 +61,10 @@ EnemyWalker.prototype.move = function() {
 			this.direction = 'left';
 		}
 	} else {
-		this.animations.play('hit');
+		if (this.direction == 'left') {
+			this.animations.play('lhit');
+		} else {
+			this.animations.play('rhit');
+		}
 	}
 };

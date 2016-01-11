@@ -26,7 +26,8 @@ var Exit = function(x, y, scale) {
   this.scale = scale;
 };
 
-var Level = function(platformsList, enemiesList, starList, itensList, exit) {
+var Level = function(levelName, platformsList, enemiesList, starList, itensList, exit) {
+  this.name = levelName;
   this.platformsList = platformsList;
   this.enemiesList = enemiesList;
   this.starsList = starList;

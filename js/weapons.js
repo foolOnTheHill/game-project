@@ -40,6 +40,7 @@ Bullet.prototype.fire = function (x, y, angle, speed, dir) {
 var Weapon = {};
 
 Weapon.Basic = function (game, sprite) {
+	this.MAX_BULLETS = 100;
 	this.bullets = 100;
 
     Phaser.Group.call(this, game, game.world, 'Basic', false, true, Phaser.Physics.ARCADE);
@@ -71,6 +72,10 @@ Weapon.Basic.prototype.fire = function (source, dir) {
     	this.nextFire = this.game.time.time + this.fireRate;
     	this.bullets--;
     }
+};
+
+Weapon.Basic.prototype.addBullets = function(value) {
+	this.bullets = Math.min(this.bullets + value, this.MAX_BULLETS);
 };
 
 Weapon.Cannon = function (game, sprite) {

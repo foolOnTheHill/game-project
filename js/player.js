@@ -34,6 +34,12 @@ var Player = function(x, y, game, sprite, scale, hp) {
 	this.heartSprites = [];
 
 	this.createHearts();
+	
+	//Substituir por sprite
+	this.BulletsText = this.game.add.text(10 * scale, 45 * scale, 'Apples: ', {
+		font : (32 * scale) + 'px "Arial"',
+		fill : '#FFFFFF'
+	});
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -53,6 +59,7 @@ Player.prototype.damage = function(value) {
 Player.prototype.fire = function() {
 	//Shooting Animation here!!
 	this.currentWeapon.fire(this, this.direction);
+	this.updateBullets();
 };
 
 Player.prototype.changeWeapon = function() {
@@ -133,4 +140,13 @@ Player.prototype.updateHearts = function() {
 		index++;
 	}
 
+};
+
+Player.prototype.updateBullets = function() {
+	this.BulletsText.text = "Apples: x" + this.currentWeapon.bullets;
+};
+
+Player.prototype.addBullets = function(value) {
+	this.weapon1.addBullets(value);
+	this.updateBullets();
 };

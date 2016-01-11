@@ -70,11 +70,12 @@ var main = {
 		this.weapons.push(new Weapon.Cannon(this.game, 'bullet'));
 
 		//PLAYER
-		this.player = new Player(10, this.game.world.height - 70 * scale, this.game, 'Jessie', scale, 5);
+		this.player = new Player(10, this.game.world.height - 70 * scale, this.game, 'Jessie', scale, 6);
 		this.player.weapon1 = this.weapons[0];
 		this.player.weapon2 = this.weapons[1];
 		this.player.currentWeapon = this.weapons[0];
-
+		this.player.updateBullets();
+		
 		//CAMERA
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW);
 

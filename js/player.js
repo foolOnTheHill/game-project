@@ -27,12 +27,19 @@ var Player = function(x, y, game, sprite, scale, hp) {
 	this.downHit = false;
 
 	this.heartSprites = [];
-
 	this.createHearts();
 
 	this.BulletIcon = this.game.add.sprite(10 * scale, 55 * scale, 'bullet');
-
 	this.BulletsText = this.game.add.text(46 * scale, 55 * scale, 'x ', {
+		font : (25 * scale) + 'px "Arial"',
+		fill : '#FFFFFF'
+	});
+
+	this.stars = 0;
+
+	this.StarIcon = this.game.add.sprite(12 * scale, 98 * scale, 'Coin');
+	this.StarIcon.frame = 1;
+	this.StarsText = this.game.add.text(46 * scale, 97 * scale, 'x 0', {
 		font : (25 * scale) + 'px "Arial"',
 		fill : '#FFFFFF'
 	});
@@ -41,7 +48,6 @@ var Player = function(x, y, game, sprite, scale, hp) {
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
-
 
 Player.prototype.damage = function(value) {
 	if (!this.tookHit) {
@@ -108,7 +114,6 @@ Player.prototype.createHearts = function() {
 	}
 
 	this.updateHearts();
-
 };
 
 Player.prototype.updateHearts = function() {
@@ -141,6 +146,15 @@ Player.prototype.updateHearts = function() {
 
 Player.prototype.updateBullets = function() {
 	this.BulletsText.text = "x " + this.currentWeapon.bullets;
+};
+
+Player.prototype.updateStars = function() {
+	this.StarsText.text = "x " + this.stars;
+};
+
+Player.prototype.collectStar = function() {
+	this.stars += 1;
+	this.updateStars();
 };
 
 Player.prototype.addBullets = function(value) {

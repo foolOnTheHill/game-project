@@ -100,7 +100,7 @@ var main = {
 		// LEVEL
 		var Tick = new EnemyShooter(this.game.world.width / 2 - 25, this.game.world.height - 390, this.game, 'Tick', 2, 2000);
 		var Teddy = new EnemyWalker(this.game.world.width / 2, this.game.world.height - 100, this.game, 'BrownTeddy', 5);
-		var Helly = new EnemyFlyer(20, this.game.world.height / 2 - 190, this.game, 'Helly', 5, false, 800, /*[0, 1], [2, 3],*/[0, 1], [8, 9], [16, 17, 18, 19, 20]);//[4, 5, 6, 7, 8, 9]);
+		var Helly = new EnemyFlyer(20, this.game.world.height / 2 - 190, this.game, 'Helly', 5, false, 800, /*[0, 1], [2, 3],*/[0, 1], [8, 9], [16], [24]);//[4, 5, 6, 7, 8, 9]);
 		var enemiesList = [Tick, Teddy, Helly];
 
 		var p1 = new Platform(this.game.world.width / 2, this.game.world.height - 162, 1, false);

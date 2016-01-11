@@ -7,7 +7,8 @@ var EnemyShooter = function(x, y, game, sprite, hp, shootPeriod) {
 
 	this.direction = 'right';
 
-	this.animations.add('hit', [15, 16, 17, 18, 19], 8, false);
+	this.animations.add('lhit', [15], 8, false);
+	this.animations.add('rhit', [24], 8, false);
 	this.shootPeriod = shootPeriod;
 	this.shootTime = this.game.time.now + shootPeriod;
 
@@ -48,7 +49,7 @@ EnemyShooter.prototype.damage = function(value) {
 EnemyShooter.prototype.updateDirection = function() {
 	//console.log("# " + main.player.x + "    " + this.x);
 
-	if (!this.tookHit || this.animations.getAnimation('hit').isFinished) {
+	if (!this.tookHit || this.animations.getAnimation('lhit').isFinished || this.animations.getAnimation('rhit').isFinished) {
 		if (main.player.x > this.x) {
 			this.frame = 7;
 			this.direction = 'right';
@@ -57,9 +58,14 @@ EnemyShooter.prototype.updateDirection = function() {
 			this.direction = 'left';
 		}
 		this.tookHit = false;
-		this.animations.getAnimation('hit').isFinished = false;
+		this.animations.getAnimation('lhit').isFinished = false;
+		this.animations.getAnimation('rhit').isFinished = false;
 	} else {
-		this.animations.play('hit');
+		if (this.direction == 'left') {
+			this.animations.play('lhit');
+		} else {
+			this.animations.play('rhit');
+		}
 	}
 };
 

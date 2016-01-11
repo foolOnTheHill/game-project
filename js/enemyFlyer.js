@@ -1,4 +1,4 @@
-var EnemyFlyer = function(x, y, game, sprite, hp, isDropper, dropPeriod, leftAnimation, rightAnimation, hitAnimation) {
+var EnemyFlyer = function(x, y, game, sprite, hp, isDropper, dropPeriod, leftAnimation, rightAnimation, lhitAnimation, rhitAnimation) {
 	Phaser.Sprite.call(this, game, x, y, sprite);
 
 	this.game.physics.arcade.enable(this);
@@ -8,7 +8,8 @@ var EnemyFlyer = function(x, y, game, sprite, hp, isDropper, dropPeriod, leftAni
 
 	this.animations.add('left', leftAnimation, 10, true);
 	this.animations.add('right', rightAnimation, 10, true);
-	this.animations.add('hit', hitAnimation, 8, false);
+	this.animations.add('lhit', lhitAnimation, 8, false);
+	this.animations.add('rhit', rhitAnimation, 8, false);
 
 	this.animations.play("right");
 	this.direction = 'right';
@@ -39,7 +40,7 @@ EnemyFlyer.prototype.damage = function(value) {
 };
 
 EnemyFlyer.prototype.move = function() {
-	if (!this.tookHit || this.animations.getAnimation('hit').isFinished) {
+	if (!this.tookHit || this.animations.getAnimation('lhit').isFinished || this.animations.getAnimation('rhit').isFinished) {
 		if (this.body.x == 0) {
 			this.body.velocity.x = 200;
 			this.animations.play('right');
@@ -66,7 +67,8 @@ EnemyFlyer.prototype.move = function() {
 		}
 
 		this.tookHit = false;
-		this.animations.getAnimation('hit').isFinished = false;
+		this.animations.getAnimation('lhit').isFinished = false;
+		this.animations.getAnimation('rhit').isFinished = false;
 		if (this.body.velocity.x > 0) {
 			this.animations.play('right');
 			this.direction = 'right';
@@ -75,6 +77,12 @@ EnemyFlyer.prototype.move = function() {
 			this.direction = 'left';
 		}
 	} else {
-		this.animations.play('hit');
+		if (this.direction == 'right') {
+			this.animations.play('rhit');
+		} else {
+			this.animations.play('lhit');
+		}
+		
+		
 	}
 };

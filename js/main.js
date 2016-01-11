@@ -75,7 +75,7 @@ var main = {
 		this.player.weapon2 = this.weapons[1];
 		this.player.currentWeapon = this.weapons[0];
 		this.player.updateBullets();
-		
+
 		//CAMERA
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW);
 
@@ -99,7 +99,7 @@ var main = {
 		// LEVEL
 		var Tick = new EnemyShooter(this.game.world.width / 2 - 25, this.game.world.height - 390, this.game, 'Tick', 2, 800);
 		var Teddy = new EnemyWalker(this.game.world.width / 2, this.game.world.height - 100, this.game, 'BrownTeddy', 5);
-		var Helly = new EnemyFlyer(20, this.game.world.height / 2 - 110, this.game, 'Helly', 5, false, 800, /*[0, 1], [2, 3],*/[0, 1], [8, 9], [16, 17, 18, 19, 20]);//[4, 5, 6, 7, 8, 9]);
+		var Helly = new EnemyFlyer(20, this.game.world.height / 2 - 190, this.game, 'Helly', 5, false, 800, /*[0, 1], [2, 3],*/[0, 1], [8, 9], [16, 17, 18, 19, 20]);//[4, 5, 6, 7, 8, 9]);
 		var enemiesList = [Tick, Teddy, Helly];
 
 		var p1 = new Platform(this.game.world.width / 2, this.game.world.height - 162, 1, false);
@@ -108,12 +108,13 @@ var main = {
 		var p4 = new Platform(this.game.world.width / 2 - 425, this.game.world.height - 339, 0.6, false);
 		var platformsList = [p1, p2, p3, p4];
 
-		var star1 = new Star(10, 10);
-		var starsList = [star1];
+		var star1 = new Star(this.game.world.width / 2 - 10, this.game.world.height - 202);
+		var star2 = new Star(this.game.world.width / 2 + 340, this.game.world.height - 292);
+		var starsList = [star1, star2];
 
 		var exit = new Exit(this.game.world.width / 2 - 445, this.game.world.height - 469, -1);
 
-		var level = new Level(platformsList, enemiesList, starsList, [], exit);
+		var level = new Level('Level 1-1', platformsList, enemiesList, starsList, [], exit);
 
 		this.loadLevel(level);
 
@@ -229,6 +230,9 @@ var main = {
 		this.game.physics.arcade.collide(this.exit, this.platforms);
 		this.game.physics.arcade.collide(this.exit, this.floor);
 
+		this.game.physics.arcade.collide(this.stars, this.platforms);
+		this.game.physics.arcade.collide(this.stars, this.floor);
+
 		this.game.physics.arcade.collide(this.platforms, this.player, function(player, plt){
 			if (plt.fall && (player.y < plt.y) && (player.x > plt.x - plt.width/2) && (player.x < plt.x + plt.width/2)) {
 				plt.body.immovable = false;
@@ -250,10 +254,16 @@ var main = {
 		//PLAYER
 		this.game.physics.arcade.overlap(this.player, this.bombs, this.hitBomb, null, this);
 		this.game.physics.arcade.overlap(this.player, this.enemies, this.hitPlayer, null, this);
+		this.game.physics.arcade.overlap(this.player, this.stars, this.collectStar, null, this);
 	},
 
 	changeWeapon : function() {
 		this.player.changeWeapon();
+	},
+
+	collectStar: function(p, s) {
+		s.kill();
+		this.player.collectStar();
 	},
 
 	hitPlayer : function(player, enemy) {
@@ -311,8 +321,15 @@ var main = {
 	},
 
 	loadLevel: function(level) {
+		this.levelName = this.game.add.text(this.game.world.width/2, 20 * scale, level.name, {
+			font : (25 * scale) + 'px "Arial"',
+			fill : '#FFFFFF'
+		});
+		this.levelName.anchor.setTo(0.5, 0.5);
+
 		this.loadPlatforms(level.platformsList);
 		this.loadEnemies(level.enemiesList);
+		this.loadStars(level.starsList);
 
 		this.exit.reset(level.exit.x, level.exit.y);
 		this.exit.anchor.setTo(0.5, 1);

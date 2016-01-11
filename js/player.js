@@ -86,8 +86,8 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.recover = function(r) {
-	this.HP = Math.max(this.MAX_HP, this.HP + r);
-	this.updateHPText();
+	this.HP = Math.min(this.MAX_HP, this.HP + r);
+	this.updateHearts();
 };
 
 Player.prototype.upgradeHp = function() {

@@ -21,11 +21,6 @@ var Player = function(x, y, game, sprite, scale, hp) {
 	this.weapon2;
 	this.currentWeapon;
 
-	/*this.HPText = this.game.add.text(75 * scale, 45 * scale, 'HP: ' + this.HP, {
-		font : (45 * scale) + 'px "Arial"',
-		fill : '#FFFFFF'
-	});*/
-
 	this.tookHit = false;
 	this.hitFlashTime = null;
 
@@ -34,12 +29,14 @@ var Player = function(x, y, game, sprite, scale, hp) {
 	this.heartSprites = [];
 
 	this.createHearts();
-	
-	//Substituir por sprite
-	this.BulletsText = this.game.add.text(10 * scale, 45 * scale, 'Apples: ', {
-		font : (32 * scale) + 'px "Arial"',
+
+	this.BulletIcon = this.game.add.sprite(10 * scale, 55 * scale, 'bullet');
+
+	this.BulletsText = this.game.add.text(46 * scale, 55 * scale, 'x ', {
+		font : (25 * scale) + 'px "Arial"',
 		fill : '#FFFFFF'
 	});
+
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -93,48 +90,48 @@ Player.prototype.recover = function(r) {
 Player.prototype.upgradeHp = function() {
 	this.MAX_HP += 2;
 	this.HP = this.MAX_HP;
-	
+
 	var n = this.MAX_HP / 2 - 1;
 	this.heartSprites[n] = this.game.add.sprite(5 + n * 40, 5, 'heart_full');
 	this.heartSprites[n].scale.setTo(0.25, 0.25);
-	
+
 	this.updateHearts();
 };
 
 
 Player.prototype.createHearts = function() {
 	var numberHearts = Math.ceil(this.MAX_HP / 2);
-	
+
 	for (var i = 0; i < numberHearts; i++) {
 		this.heartSprites[i] = this.game.add.sprite(5 + i * 40, 5, 'heart_full');
 		this.heartSprites[i].scale.setTo(0.25, 0.25);
 	}
-	
+
 	this.updateHearts();
 
 };
 
 Player.prototype.updateHearts = function() {
-	
+
 	var numberHearts = Math.ceil(this.MAX_HP / 2);
-	
+
 	var h = this.HP % 2;
 	var e = Math.floor((this.MAX_HP - this.HP) / 2);
 	var f = (numberHearts - h - e);
-	
+
 	var index = 0;
 	var sprite;
-	
+
 	for (var i = 0; i < f; i++) {
 		this.heartSprites[index].loadTexture('heart_full');
 		index++;
 	}
-	
+
 	if (h == 1) {
 		this.heartSprites[index].loadTexture('heart_half');
 		index++;
 	}
-	
+
 	for (var i = 0; i < e; i++) {
 		this.heartSprites[index].loadTexture('heart_empty');
 		index++;
@@ -143,7 +140,7 @@ Player.prototype.updateHearts = function() {
 };
 
 Player.prototype.updateBullets = function() {
-	this.BulletsText.text = "Apples: x" + this.currentWeapon.bullets;
+	this.BulletsText.text = "x " + this.currentWeapon.bullets;
 };
 
 Player.prototype.addBullets = function(value) {

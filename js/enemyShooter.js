@@ -32,7 +32,7 @@ EnemyShooter.prototype.update = function() {
 		this.updateDirection();
 		this.shoot();
 	}
-	
+
 };
 
 EnemyShooter.prototype.damage = function(value) {

@@ -13,6 +13,7 @@ var Player = function(x, y, game, sprite, scale, hp) {
 	this.body.collideWorldBounds = true;
 
 	this.playerDirection = 'left';
+	this.changeDirectionInverval = -1;
 
 	this.direction = 1;
 	this.HP = hp;

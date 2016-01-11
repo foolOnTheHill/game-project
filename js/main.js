@@ -167,10 +167,19 @@ var main = {
 		var vy = this.player.body.velocity.y;
 
 		if (this.cursors.left.isDown) {
-			this.player.body.velocity.x = -250;
 
 			if (this.player.direction == 1) {
 				this.player.scale.x *= -1;
+
+				if (this.player.body.touching.down) {
+					this.player.changeDirectionInverval = this.game.time.now + 40;
+				} else {
+					this.player.changeDirectionInverval = -1;
+				}
+			}
+
+			if (this.game.time.now > this.player.changeDirectionInverval){
+				this.player.body.velocity.x = -250;
 			}
 
 			this.player.playerDirection = 'left';
@@ -179,10 +188,19 @@ var main = {
 
 			this.player.downHit = false;
 		} else if (this.cursors.right.isDown) {
-			this.player.body.velocity.x = 250;
 
 			if (this.player.direction == -1) {
 				this.player.scale.x *= -1;
+
+				if (this.player.body.touching.down) {
+					this.player.changeDirectionInverval = this.game.time.now + 40;
+				} else {
+					this.player.changeDirectionInverval = -1;
+				}
+			}
+
+			if (this.game.time.now > this.player.changeDirectionInverval) {
+				this.player.body.velocity.x = 250;
 			}
 
 			this.player.playerDirection = 'right';

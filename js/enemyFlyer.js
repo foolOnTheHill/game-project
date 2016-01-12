@@ -30,7 +30,7 @@ EnemyFlyer.prototype.update = function() {
 	if (this.game.physics.arcade.isPaused) {
 		this.animations.stop();
 	}
-	
+
 	this.move();
 };
 
@@ -60,7 +60,7 @@ EnemyFlyer.prototype.move = function() {
 		}
 
 		if (this.isDropper && this.game.time.now > this.dropTime && this.alive) {
-			var c = main.bombs.getFirstDead();
+			var c = this.game.player.bombs.getFirstDead();
 			c.reset(this.x, this.y + this.height);
 			this.game.physics.enable(c);
 			c.body.bounce = 0.3;

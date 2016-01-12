@@ -24,7 +24,7 @@ EnemyStatic.prototype.update = function() {
 	if (this.game.physics.arcade.isPaused) {
 		this.animations.stop();
 	}
-	
+
 	this.updateDirection();
 };
 
@@ -40,10 +40,10 @@ EnemyStatic.prototype.damage = function(value) {
 };
 
 EnemyStatic.prototype.updateDirection = function() {
-	//console.log("# " + main.player.x + "    " + this.x);
+	//console.log("# " + this.game.player.player.x + "    " + this.x);
 
 	if (!this.tookHit || this.animations.getAnimation('hit').isFinished) {
-		if (main.player.x > this.x) {
+		if (this.game.player.x > this.x) {
 			this.frame = 7;
 			this.direction = 'right';
 		} else {

@@ -29,9 +29,9 @@ EnemyShooter.prototype.update = function() {
 	}
 
 	if (this.alive) {
-		this.game.physics.arcade.overlap(main.player, this.bullets, main.bulletHitPlayer, null, main);
-		this.game.physics.arcade.overlap(this.bullets, main.platforms, main.killBullet, null, this);
-		this.game.physics.arcade.overlap(this.bullets, main.floor, main.killBullet, null, this);
+		this.game.physics.arcade.overlap(this.game.player, this.bullets, this.game.state.getCurrentState().bulletHitPlayer, null, this.game.state.getCurrentState());
+		this.game.physics.arcade.overlap(this.bullets, this.game.state.getCurrentState().platforms, this.game.state.getCurrentState().killBullet, null, this);
+		this.game.physics.arcade.overlap(this.bullets, this.game.state.getCurrentState().floor, this.game.state.getCurrentState().killBullet, null, this);
 
 		this.updateDirection();
 		this.shoot();
@@ -51,10 +51,10 @@ EnemyShooter.prototype.damage = function(value) {
 };
 
 EnemyShooter.prototype.updateDirection = function() {
-	//console.log("# " + main.player.x + "    " + this.x);
+	//console.log("# " + this.game.player.x + "    " + this.x);
 
 	if (!this.tookHit || this.animations.getAnimation('lhit').isFinished || this.animations.getAnimation('rhit').isFinished) {
-		if (main.player.x > this.x) {
+		if (this.game.player.x > this.x) {
 			this.frame = 7;
 			this.direction = 'right';
 		} else {

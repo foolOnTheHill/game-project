@@ -5,6 +5,8 @@ var width = Math.round(2.07 * height);
 
 var scale = height / 650;
 
+var stars = 0;
+
 var main = {
 	preload : function() {
 		this.game.load.spritesheet('Tick', 'assets/enemies/Tick41x50.png', 50, 41);
@@ -21,7 +23,7 @@ var main = {
 
 		this.game.load.spritesheet('Coin', 'assets/Money24x25.png', 25, 24);
 
-		this.game.load.image('platform', 'assets/platformTest.png');
+		this.game.load.image('platform', 'assets/platform.png');
 		//this.game.load.image('bullet', 'assets/bullet.png');
 
 		this.game.load.image('sky', 'assets/test/sky.png');
@@ -40,6 +42,18 @@ var main = {
 		this.game.load.image('heart_empty', 'assets/UI/UI_HEART_EMPTY.png');
 		this.game.load.image('heart_half', 'assets//UI/UI_HEART_HALF.png');
 		this.game.load.image('heart_full', 'assets/UI/UI_HEART_FULL.png');
+
+		this.game.load.image('level_name_background', 'assets/UI/UI_INPUT.png');
+
+		this.game.load.image('mute', 'assets/UI/SYMB_MUTE.png');
+		this.game.load.image('unmute', 'assets/UI/SYMB_VOLUME.png');
+		this.game.load.image('pause', 'assets/UI/SYMB_PAUSE.png');
+		this.game.load.image('play', 'assets/UI/SYMB_PLAY.png');
+		this.game.load.image('replay', 'assets/UI/SYMB_REPLAY.png');
+
+		this.game.load.image('bg1', 'assets/bgs/bg1.jpg');
+		this.game.load.image('bg2', 'assets/bgs/bg2.jpg');
+		this.game.load.image('bg3', 'assets/bgs/bg3.png');
 	},
 
 	create : function() {
@@ -49,8 +63,8 @@ var main = {
 		this.game.physics.arcade.gravity.y = 750;
 
 		//BACKGROUND SPRITE
-		var background = this.game.add.sprite(0, 0, 'sky');
-		background.scale.setTo(2, 2);
+		var background = this.game.add.sprite(0, 0, 'bg3');
+		background.scale.setTo(1.5, 2);
 
 		//FLOOR
 		this.floor = this.game.add.group();
@@ -69,13 +83,6 @@ var main = {
 		this.weapons = [];
 		this.weapons.push(new Weapon.Basic(this.game, 'bullet'));
 		this.weapons.push(new Weapon.Cannon(this.game, 'bullet'));
-
-		//PLAYER
-		this.player = new Player(10, this.game.world.height - 70 * scale, this.game, 'Jessie', scale, 6);
-		this.player.weapon1 = this.weapons[0];
-		this.player.weapon2 = this.weapons[1];
-		this.player.currentWeapon = this.weapons[0];
-		this.player.updateBullets();
 
 		//CAMERA
 		this.game.camera.follow(this.player, Phaser.Camera.FOLLOW);
@@ -97,7 +104,26 @@ var main = {
 		// EXIT
 		this.exit = new EnemyStatic(0, 0, this.game, 'Lucas', 0);
 
-		// LEVEL
+		//
+		this.bulletTime = this.game.time.now + 200;
+		this.jumpTime = this.game.time.now + 300;
+
+		this.replayButton = this.game.add.image(this.game.world.width - 70, 15, 'replay');
+		this.replayButton.scale.setTo(0.6	, 0.6);
+		this.replayButton.inputEnabled = true;
+		this.replayButton.events.onInputDown.add(this.restartLevel, this);
+
+		this.pauseButton = this.game.add.image(this.game.world.width - 130, 15, 'pause');
+		this.pauseButton.scale.setTo(0.6, 0.6);
+		this.pauseButton.inputEnabled = true;
+		this.pauseButton.events.onInputDown.add(this.pauseGame, this);
+
+		this.isMute = false;
+		this.muteButton = this.game.add.image(this.game.world.width - 65, this.game.world.height - 76, 'unmute');
+		this.muteButton.scale.setTo(0.6	, 0.6);
+		this.muteButton.inputEnabled = true;
+		this.muteButton.events.onInputDown.add(this.mute, this);
+
 		var Tick = new EnemyShooter(this.game.world.width / 2 - 25, this.game.world.height - 390, this.game, 'Tick', 2, 2000);
 		var Teddy = new EnemyWalker(this.game.world.width / 2, this.game.world.height - 100, this.game, 'BrownTeddy', 5);
 		var Helly = new EnemyFlyer(20, this.game.world.height / 2 - 190, this.game, 'Helly', 5, false, 800, /*[0, 1], [2, 3],*/[0, 1], [8, 9], [16], [24]);//[4, 5, 6, 7, 8, 9]);
@@ -117,11 +143,40 @@ var main = {
 
 		var level = new Level('Level 1-1', platformsList, enemiesList, starsList, [], exit);
 
-		this.loadLevel(level);
+		// LEVEL
+		this.currentLevel = 0;
+		this.levels = [level];
 
-		//
-		this.bulletTime = this.game.time.now + 200;
-		this.jumpTime = this.game.time.now + 300;
+		this.loadLevel();
+
+		//PLAYER
+		this.player = new Player(10, this.game.world.height - 70 * scale, this.game, 'Jessie', scale, 6);
+		this.player.weapon1 = this.weapons[0];
+		this.player.weapon2 = this.weapons[1];
+		this.player.currentWeapon = this.weapons[0];
+		this.player.updateBullets();
+	},
+
+	mute: function() {
+		this.muteButton.destroy();
+
+		if (this.isMute) {
+			this.muteButton = this.game.add.image(this.game.world.width - 65, this.game.world.height - 69, 'mute');
+		} else {
+			this.muteButton = this.game.add.image(this.game.world.width - 65, this.game.world.height - 76, 'unmute');
+		}
+		this.muteButton.scale.setTo(0.6	, 0.6);
+		this.muteButton.inputEnabled = true;
+		this.muteButton.events.onInputDown.add(this.mute, this);
+		this.isMute = !this.isMute;
+	},
+
+	restartLevel: function() {
+		this.loadLevel(this.currentLevel);
+	},
+
+	pauseGame: function() {
+		 this.game.physics.arcade.isPaused = (this.game.physics.arcade.isPaused) ? false : true;
 	},
 
 	setFloor : function() {
@@ -166,7 +221,7 @@ var main = {
 		var vx = this.player.body.velocity.x;
 		var vy = this.player.body.velocity.y;
 
-		if (this.cursors.left.isDown) {
+		if (this.cursors.left.isDown && !this.cursors.down.isDown) {
 
 			if (this.player.direction == 1) {
 				this.player.scale.x *= -1;
@@ -187,7 +242,7 @@ var main = {
 			this.player.animations.play('walk');
 
 			this.player.downHit = false;
-		} else if (this.cursors.right.isDown) {
+		} else if (this.cursors.right.isDown && !this.cursors.down.isDown) {
 
 			if (this.player.direction == -1) {
 				this.player.scale.x *= -1;
@@ -232,6 +287,7 @@ var main = {
 	},
 
 	update : function() {
+		if (this.game.physics.arcade.isPaused) return;
 
 		this.collisions();
 		this.movePlayer();
@@ -274,6 +330,12 @@ var main = {
 		this.game.physics.arcade.overlap(this.player, this.bombs, this.hitBomb, null, this);
 		this.game.physics.arcade.overlap(this.player, this.enemies, this.hitPlayer, null, this);
 		this.game.physics.arcade.overlap(this.player, this.stars, this.collectStar, null, this);
+
+		this.game.physics.arcade.overlap(this.player, this.exit, this.nextLevel, null, this);
+	},
+
+	nextLevel: function() {
+		// stars = this.player.stars;
 	},
 
 	changeWeapon : function() {
@@ -287,7 +349,7 @@ var main = {
 
 	hitPlayer : function(player, enemy) {
 		if ((!player.downHit && player.y  > enemy.y) || (player.downHit && enemy.y + enemy.height >= player.y - player.height/2)) {
-			enemy.damage(0);
+			// enemy.damage(0);
 			this.player.animations.play('hit', null, false, true);
 			this.player.damage(1);
 			this.checkGameOver();
@@ -339,10 +401,15 @@ var main = {
 		this.game.state.restart();
 	},
 
-	loadLevel: function(level) {
-		this.levelName = this.game.add.text(this.game.world.width/2, 20 * scale, level.name, {
+	loadLevel: function() {
+		var level = this.levels[this.currentLevel];
+
+		this.levelNameBackground = this.game.add.image(this.game.world.width/2, 30 * scale, 'level_name_background');
+		this.levelNameBackground.anchor.setTo(0.5, 0.5);
+
+		this.levelName = this.game.add.text(this.game.world.width/2, 35 * scale, level.name, {
 			font : (25 * scale) + 'px "Arial"',
-			fill : '#FFFFFF'
+			fill : '#000000',
 		});
 		this.levelName.anchor.setTo(0.5, 0.5);
 

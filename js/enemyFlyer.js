@@ -27,6 +27,10 @@ EnemyFlyer.prototype = Object.create(Phaser.Sprite.prototype);
 EnemyFlyer.prototype.constructor = Enemy;
 
 EnemyFlyer.prototype.update = function() {
+	if (this.game.physics.arcade.isPaused) {
+		this.animations.stop();
+	}
+	
 	this.move();
 };
 
@@ -82,7 +86,7 @@ EnemyFlyer.prototype.move = function() {
 		} else {
 			this.animations.play('lhit');
 		}
-		
-		
+
+
 	}
 };

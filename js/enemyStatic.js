@@ -21,6 +21,10 @@ EnemyStatic.prototype = Object.create(Phaser.Sprite.prototype);
 EnemyStatic.prototype.constructor = Enemy;
 
 EnemyStatic.prototype.update = function() {
+	if (this.game.physics.arcade.isPaused) {
+		this.animations.stop();
+	}
+	
 	this.updateDirection();
 };
 

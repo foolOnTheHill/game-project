@@ -22,6 +22,10 @@ EnemyWalker.prototype = Object.create(Phaser.Sprite.prototype);
 EnemyWalker.prototype.constructor = Enemy;
 
 EnemyWalker.prototype.update = function() {
+	if (this.game.physics.arcade.isPaused) {
+		this.animations.stop();
+	}
+	
 	this.move();
 };
 

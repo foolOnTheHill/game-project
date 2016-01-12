@@ -24,6 +24,10 @@ EnemyShooter.prototype = Object.create(Phaser.Sprite.prototype);
 EnemyShooter.prototype.constructor = Enemy;
 
 EnemyShooter.prototype.update = function() {
+	if (this.game.physics.arcade.isPaused) {
+		this.animations.stop();
+	}
+
 	if (this.alive) {
 		this.game.physics.arcade.overlap(main.player, this.bullets, main.bulletHitPlayer, null, main);
 		this.game.physics.arcade.overlap(this.bullets, main.platforms, main.killBullet, null, this);

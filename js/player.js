@@ -35,6 +35,7 @@ var Player = function(x, y, game, sprite, scale, hp) {
 		font : (25 * scale) + 'px "Arial"',
 		fill : '#FFFFFF'
 	});
+	this.BulletsText.setShadow(3, 3, '#000000', 5);
 
 	this.stars = 0;
 
@@ -44,6 +45,7 @@ var Player = function(x, y, game, sprite, scale, hp) {
 		font : (25 * scale) + 'px "Arial"',
 		fill : '#FFFFFF'
 	});
+	this.StarsText.setShadow(3, 3, '#000000', 5);
 
 };
 
@@ -81,6 +83,10 @@ Player.prototype.updateHPText = function() {
 
 
 Player.prototype.update = function() {
+	if (this.game.physics.arcade.isPaused) {
+		this.animations.stop();
+	}
+
 	if (this.tookHit) {
 		if (this.game.time.now >= this.hitFlashTime) {
 			this.tint = 0xffffff;

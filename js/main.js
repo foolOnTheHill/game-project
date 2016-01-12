@@ -37,7 +37,7 @@ function getState(starsCount, currentLevel) {
 
 	var level = new Level('Level 1-1', platformsList, enemiesList, starsList, [], exit);
 
-	var levels = [level];
+	var levels = [level, level, level, level];
 
 	var main = {
 		create : function() {
@@ -304,7 +304,7 @@ function getState(starsCount, currentLevel) {
 		nextLevel: function() {
 			var stars = this.player.stars;
 			var nextLvl = currentLevel+1;
-			var next = getState(currentStars, nextLvl);
+			var next = getState(stars, nextLvl);
 			this.game.state.add(''+nextLvl, next);
 			this.game.state.start(''+nextLvl);
 		},

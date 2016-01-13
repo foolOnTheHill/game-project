@@ -365,7 +365,7 @@ function getState(starsCount, currentLevel) {
 				}
 
 				this.player.animations.play('hit', null, false, true);
-				this.player.damage(2);
+				this.player.damage(damage);
 				this.checkGameOver();
 			}
 		},

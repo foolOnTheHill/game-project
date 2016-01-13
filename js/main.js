@@ -50,7 +50,7 @@ function getState(starsCount, currentLevel) {
 
 	var bossLevel = new Level('Boss', [p5, p6, p7, p8], {shooters:[Tick1, Tick2], boss: bossToy}, [], [], width - 100, height - 100, null);
 
-	var levels = [level, bossLevel, level];
+	var levels = [level, bossLevel];
 
 	var main = {
 		create : function() {
@@ -357,13 +357,15 @@ function getState(starsCount, currentLevel) {
 
 		hitPlayer : function(player, enemy) {
 			if ((!player.downHit && player.y  > enemy.y) || (player.downHit && enemy.y + enemy.height >= player.y - player.height/2)) {
+				var damage = 1;
 
 				if (enemy.isBoss != undefined) {
 					enemy.hitPlayer();
+					damage = 2;
 				}
 
 				this.player.animations.play('hit', null, false, true);
-				this.player.damage(1);
+				this.player.damage(2);
 				this.checkGameOver();
 			}
 		},
@@ -567,6 +569,9 @@ game.state.add('load', {
 		this.game.load.image('bg1', 'assets/bgs/bg1.jpg');
 		this.game.load.image('bg2', 'assets/bgs/bg2.jpg');
 		this.game.load.image('bg3', 'assets/bgs/bg3.png');
+
+		this.game.load.image('loading', 'assets/UI/loading.png');
+		this.game.load.image('loading2', 'assets/UI/loading2.png');
 	},
 	update: function() {
 		this.game.state.add('0', getState(0, 0));

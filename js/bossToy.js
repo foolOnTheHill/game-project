@@ -17,6 +17,7 @@ var BossToy = function(x, y, game, hp, sprite) {
 	this.animations.play("right");
 	this.direction = 'right';
 
+	this.max_hp = hp;
 	this.hp = hp;
 
 	this.tookHit = false;
@@ -25,6 +26,14 @@ var BossToy = function(x, y, game, hp, sprite) {
 	this.dashing = false;
 
 	this.isBoss = true;
+
+	this.hp_bar_border = this.game.add.image(this.game.world.width/2, 100, 'loading2');
+	this.hp_bar_border.width = 400;
+	this.hp_bar_border.height = 20;
+	this.hp_bar_border.anchor.setTo(0.5, 0.5);
+
+	this.hp_bar = this.game.add.image(this.game.world.width/2 - this.hp_bar_border.width/2 + 4, 100 - hp, 'loading');
+	this.hp_bar.width = 400;
 };
 
 BossToy.prototype = Object.create(Phaser.Sprite.prototype);
@@ -53,6 +62,8 @@ BossToy.prototype.damage = function(value) {
 	}
 	this.tookHit = true;
 	console.log(this.hp);
+
+	this.hp_bar.width *= this.hp / this.max_hp;
 };
 
 BossToy.prototype.hitPlayer = function() {

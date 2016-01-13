@@ -35,9 +35,22 @@ function getState(starsCount, currentLevel) {
 
 	var exit = new Exit(width / 2 - 445, height - 469, -1);
 
-	var level = new Level('Level 1-1', platformsList, enemiesList, starsList, [], exit);
+	var level = new Level('Level 1-1', platformsList, enemiesList, starsList, [], 70, height - 100, exit);
 
-	var levels = [level, level, level, level];
+	var p5 = new Platform(width/2 - 260, height - 110, 1, false);
+	var p6 = new Platform(width/2 + 260, height - 110, 1, false);
+
+	var p7 = new Platform(25, height - 200, 0.2, false);
+	var p8 = new Platform(width - 25, height - 200, 0.2, false);
+
+	var bossToy = new Boss(200, height - 200, 10, 'ToyTrojan');
+
+	var Tick1 = new Shooter(0, height - 250, 'Tick', 10, 2000);
+	var Tick2 = new Shooter(width - 2, height - 250, 'Tick', 10, 2000);
+
+	var bossLevel = new Level('Boss', [p5, p6, p7, p8], {shooters:[Tick1, Tick2], boss: bossToy}, [], [], width - 100, height - 100, null);
+
+	var levels = [level, bossLevel, level];
 
 	var main = {
 		create : function() {
@@ -88,9 +101,21 @@ function getState(starsCount, currentLevel) {
 			// EXIT
 			this.exit = new EnemyStatic(0, 0, this.game, 'Lucas', 0);
 
+			// LEVEL
+			this.level = levels[currentLevel];
+
+			//PLAYER
+			this.player = new Player(this.level.playerX, this.level.playerY, this.game, 'Jessie', scale, 6);
+			this.player.weapon1 = this.weapons[0];
+			this.player.weapon2 = this.weapons[1];
+			this.player.currentWeapon = this.weapons[0];
+			this.player.updateBullets();
+
 			//
 			this.bulletTime = this.game.time.now + 200;
 			this.jumpTime = this.game.time.now + 300;
+			this.isBossLevel = true;
+			this.boss = null;
 
 			this.replayButton = this.game.add.image(this.game.world.width - 70, 15, 'replay');
 			this.replayButton.scale.setTo(0.6	, 0.6);
@@ -108,17 +133,7 @@ function getState(starsCount, currentLevel) {
 			this.muteButton.inputEnabled = true;
 			this.muteButton.events.onInputDown.add(this.mute, this);
 
-			//PLAYER
-			this.player = new Player(10, this.game.world.height - 70 * scale, this.game, 'Jessie', scale, 6);
-			this.player.weapon1 = this.weapons[0];
-			this.player.weapon2 = this.weapons[1];
-			this.player.currentWeapon = this.weapons[0];
-			this.player.updateBullets();
-
 			this.game.player = this.player;
-
-			// LEVEL
-			this.level = levels[currentLevel];
 
 			this.loadLevel();
 
@@ -262,6 +277,12 @@ function getState(starsCount, currentLevel) {
 			if (this.fireButton.isDown) {
 				this.player.fire();
 			}
+
+			if (this.isBossLevel) {
+				if (this.boss != null && !this.boss.alive) {
+					this.killedBoss();
+				}
+			}
 		},
 
 		collisions : function() {
@@ -291,7 +312,7 @@ function getState(starsCount, currentLevel) {
 			this.game.physics.arcade.overlap(this.player.currentWeapon, this.floor, this.killBullet, null, this);
 
 			//BULLETS - ENEMIES
-			game.physics.arcade.overlap(this.player.currentWeapon, this.enemies, this.hitEnemy, null, this);
+			this.game.physics.arcade.overlap(this.player.currentWeapon, this.enemies, this.hitEnemy, null, this);
 
 			//PLAYER
 			this.game.physics.arcade.overlap(this.player, this.bombs, this.hitBomb, null, this);
@@ -299,6 +320,12 @@ function getState(starsCount, currentLevel) {
 			this.game.physics.arcade.overlap(this.player, this.stars, this.collectStar, null, this);
 
 			this.game.physics.arcade.overlap(this.player, this.exit, this.nextLevel, null, this);
+
+			if (this.isBossLevel) {
+				this.game.physics.arcade.collide(this.boss, this.floor, null, null, this);
+				this.game.physics.arcade.overlap(this.boss, this.player.currentWeapon, this.hitBoss, null, this);
+				this.game.physics.arcade.overlap(this.player, this.boss, this.hitPlayer, null, this);
+			}
 		},
 
 		nextLevel: function() {
@@ -307,6 +334,16 @@ function getState(starsCount, currentLevel) {
 			var next = getState(stars, nextLvl);
 			this.game.state.add(''+nextLvl, next);
 			this.game.state.start(''+nextLvl);
+		},
+
+		killedBoss: function() {
+			// Tocar musiquinha, etc
+			this.nextLevel();
+		},
+
+		hitBoss: function(target, bullet) {
+			target.damage(bullet.damage);
+			bullet.kill();
 		},
 
 		changeWeapon : function() {
@@ -320,7 +357,11 @@ function getState(starsCount, currentLevel) {
 
 		hitPlayer : function(player, enemy) {
 			if ((!player.downHit && player.y  > enemy.y) || (player.downHit && enemy.y + enemy.height >= player.y - player.height/2)) {
-				// enemy.damage(0);
+
+				if (enemy.isBoss != undefined) {
+					enemy.hitPlayer();
+				}
+
 				this.player.animations.play('hit', null, false, true);
 				this.player.damage(1);
 				this.checkGameOver();
@@ -358,6 +399,8 @@ function getState(starsCount, currentLevel) {
 		},
 
 		hitEnemy : function(bullet, target) {
+			// console.log(bullet);
+			// console.log(target);
 			target.damage(bullet.damage);
 			bullet.kill();
 		},
@@ -387,12 +430,28 @@ function getState(starsCount, currentLevel) {
 			this.levelName.anchor.setTo(0.5, 0.5);
 
 			this.loadPlatforms(level.platformsList);
+
 			this.loadEnemies(level.enemiesList);
+
+			if (level.enemiesList.hasOwnProperty('boss')) {
+				this.loadBoss(level.enemiesList.boss);
+			}
+
 			this.loadStars(level.starsList);
 
-			this.exit.reset(level.exit.x, level.exit.y);
-			this.exit.anchor.setTo(0.5, 1);
-			this.exit.scale.x = level.exit.scale;
+			if (level.exit != undefined) {
+				this.exit.reset(level.exit.x, level.exit.y);
+				this.exit.anchor.setTo(0.5, 1);
+				this.exit.scale.x = level.exit.scale;
+			} else {
+				this.exit.kill();
+			}
+		},
+
+		loadBoss: function(boss) {
+			var bossToy = new BossToy(boss.x, boss.y, this.game, boss.hp, boss.sprite);
+			this.boss = bossToy;
+			this.isBossLevel = true;
 		},
 
 		loadPlatforms: function(platformsList) {
@@ -421,17 +480,17 @@ function getState(starsCount, currentLevel) {
 				e.kill();
 			});
 
-			for (var i = 0; i < enemiesList.walkers.length; i++) {
+			for (var i = 0; enemiesList.walkers != undefined && i < enemiesList.walkers.length; i++) {
 				var w = enemiesList.walkers[i];
 				this.enemies.add(new EnemyWalker(w.x, w.y, this.game, w.sprite, w.hp));
 			}
 
-			for (var i = 0; i < enemiesList.shooters.length; i++) {
+			for (var i = 0; enemiesList.shooters != undefined && i < enemiesList.shooters.length; i++) {
 				var w = enemiesList.shooters[i];
 				this.enemies.add(new EnemyShooter(w.x, w.y, this.game, w.sprite, w.hp, w.shootPeriod));
 			}
 
-			for (var i = 0; i < enemiesList.flyers.length; i++) {
+			for (var i = 0; enemiesList.flyers != undefined && i < enemiesList.flyers.length; i++) {
 				var w = enemiesList.flyers[i];
 				this.enemies.add(new EnemyFlyer(w.x, w.y, this.game, w.sprite, w.hp, w.isDropper, w.dropPeriod, w.leftAnimation, w.rightAnimation, w.lhitAnimation, w.rhitAnimation));
 			}
@@ -468,6 +527,7 @@ game.state.add('load', {
 		this.game.load.spritesheet('DirtyRatz', 'assets/enemies/DirtyRatz52x70.png', 70, 52);
 		this.game.load.spritesheet('Helly', 'assets/enemies/Helly70x60.png', 60, 70);
 		this.game.load.spritesheet('Planey', 'assets/enemies/Planey45x70.png', 70, 45);
+		this.game.load.spritesheet('ToyTrojan', 'assets/enemies/ToyTrojan130x160.png', 160, 130);
 
 		this.game.load.spritesheet('Danny', 'assets/Danny70x70.png', 70, 70);
 		this.game.load.spritesheet('Jessie', 'assets/Jessie70x70.png', 70, 70);

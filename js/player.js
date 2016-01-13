@@ -16,11 +16,17 @@ var Player = function(x, y, game, sprite, scale, hp) {
 	this.changeDirectionInverval = -1;
 
 	this.direction = 1;
+	
 	this.HP = hp;
 	this.MAX_HP = 6;
+	this.baseAttack = 1;
 	this.attack = 1;
+	this.baseSpeed = 250;
 	this.speed = 250;
+	this.baseDefense = 0;
 	this.defense = 0;
+	this.powerUpDuration = 5;
+	
 	this.weapon1;
 	this.weapon2;
 	this.currentWeapon;
@@ -49,11 +55,32 @@ var Player = function(x, y, game, sprite, scale, hp) {
 		fill : '#FFFFFF'
 	});
 	this.StarsText.setShadow(3, 3, '#000000', 5);
+			
+	this.timer = this.game.time.create(false);
+	this.timer.add(2000, this.powerUpEnd, this);
+	this.timer.start();
 
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
+
+Player.prototype.update = function() {
+	if (this.game.physics.arcade.isPaused) {
+		this.animations.stop();
+	}
+
+	if (this.tookHit) {
+		if (this.game.time.now >= this.hitFlashTime) {
+			this.tint = 0xffffff;
+			this.tookHit = false;
+		}
+	}
+	
+	//Debug Stats
+	//console.log("HP: " + this.HP + "/" + this.MAX_HP + " Attack: " + this.attack + " Defense: " + this.defense + " Speed: " + this.speed);
+	
+};
 
 Player.prototype.damage = function(value) {
 	if (!this.tookHit) {
@@ -62,7 +89,12 @@ Player.prototype.damage = function(value) {
 		this.tookHit = true;
 		this.hitFlashTime = this.game.time.now + 1200;
 		this.updateHearts();
+		
+		//this.timer = this.game.time.events.add(Phaser.Timer.SECOND * 4, this.testPU, this);
+		//this.timer.pause();
+		
 	}
+	
 };
 
 Player.prototype.fire = function() {
@@ -82,31 +114,13 @@ Player.prototype.changeWeapon = function() {
 	this.updateBullets();
 };
 
-Player.prototype.updateHPText = function() {
-	 this.HPText.text = 'HP: ' + this.HP;
-	 this.HPText.anchor.setTo(0.5, 0.5);
-};
-
-
-Player.prototype.update = function() {
-	if (this.game.physics.arcade.isPaused) {
-		this.animations.stop();
-	}
-
-	if (this.tookHit) {
-		if (this.game.time.now >= this.hitFlashTime) {
-			this.tint = 0xffffff;
-			this.tookHit = false;
-		}
-	}
-};
 
 Player.prototype.recover = function(r) {
 	this.HP = Math.min(this.MAX_HP, this.HP + r);
 	this.updateHearts();
 };
 
-Player.prototype.upgradeHp = function() {
+Player.prototype.upgradeHP = function() {
 	this.MAX_HP += 2;
 	this.HP = this.MAX_HP;
 
@@ -178,4 +192,32 @@ Player.prototype.collectStar = function() {
 Player.prototype.addBullets = function(value) {
 	this.weapon1.addBullets(value);
 	this.updateBullets();
+};
+
+Player.prototype.powerUp = function(powerUp) {
+	
+	this.powerUpEnd();
+	this.timer.destroy();
+	this.timer = this.game.time.create(false);
+	this.timer.add(this.powerUpDuration * 1000, this.powerUpEnd, this);
+	this.timer.start();
+	
+	if (powerUp == 'defense') {
+		this.defense += 1;
+		console.log("Defense Up picked!");
+	} else if (powerUp == 'speed') {
+		console.log("Speed Up picked!");
+		this.speed += 100;
+	} else if (powerUp == 'attack') {
+		console.log("Attack Up picked!");
+		this.attack += 1;
+	}
+	
+};
+
+Player.prototype.powerUpEnd = function() {
+	console.log("Power Up ended!");
+	this.attack = this.baseAttack;
+	this.defense = this.baseDefense;
+	this.speed = this.baseSpeed;
 };

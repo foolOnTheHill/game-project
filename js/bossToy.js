@@ -78,7 +78,6 @@ BossToy.prototype.hitPlayer = function() {
 };
 
 BossToy.prototype.move = function() {
-	console.log(this.playerDetected());
 	if (this.playerDetected() && !this.dashing) {
 		this.dash();
 		return;
@@ -166,6 +165,5 @@ BossToy.prototype.playerDetected = function() {
 	
 	var ldetect = this.game.player.x < this.x && Math.abs(this.game.player.x - this.x) < 500 && this.direction == 'left';
 	var rdetect = this.game.player.x > (this.x + this.width) && Math.abs(this.game.player.x - this.x) < 500 && this.direction == 'right';
-	console.log(this.game.player.x + "    " + this.x);
 	return (rdetect || ldetect) && this.y - this.game.player.y < 0;
 };

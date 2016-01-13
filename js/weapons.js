@@ -50,7 +50,7 @@ Weapon.Basic = function (game, sprite) {
     this.bulletSpeed = 600;
     this.fireRate = 200;
 
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 100; i++) {
         this.add(new Bullet(game, sprite, 1), true);
     }
 
@@ -85,10 +85,10 @@ Weapon.Cannon = function (game, sprite) {
     Phaser.Group.call(this, game, game.world, 'Cannon', false, true, Phaser.Physics.ARCADE);
 
     this.nextFire = 0;
-    this.bulletSpeed = 500;
+    this.bulletSpeed = 400;
     this.fireRate = 500;
 
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 100; i++) {
         this.add(new Bullet(game, sprite, 3), true);
     }
 
@@ -103,8 +103,9 @@ Weapon.Cannon.prototype.fire = function (source, dir) {
 	//console.log(this.bullets);
 	if (this.game.time.time < this.nextFire) { return; }
 
-    var x = source.x + 10;
-    var y = source.y - 30;
+    var offset = 20 - (dir * 40);
+    var x = source.x - offset;
+    var y = source.y - 50;
 
     if (this.bullets > 0) {
 		this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, dir);

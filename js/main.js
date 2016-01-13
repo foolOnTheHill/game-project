@@ -76,11 +76,6 @@ function getState(starsCount, currentLevel) {
 			this.stars = this.game.add.group();
 			this.stars.createMultiple(100, 'Coin');
 
-			// WEAPONS
-			this.weapons = [];
-			this.weapons.push(new Weapon.Basic(this.game, 'bullet'));
-			this.weapons.push(new Weapon.Cannon(this.game, 'bullet'));
-
 			//CAMERA
 			this.game.camera.follow(this.player, Phaser.Camera.FOLLOW);
 
@@ -103,6 +98,11 @@ function getState(starsCount, currentLevel) {
 
 			// LEVEL
 			this.level = levels[currentLevel];
+			
+			// WEAPONS
+			this.weapons = [];
+			this.weapons.push(new Weapon.Basic(this.game, 'bullet'));
+			this.weapons.push(new Weapon.Cannon(this.game, 'bullet2'));
 
 			//PLAYER
 			this.player = new Player(this.level.playerX, this.level.playerY, this.game, 'Jessie', scale, 6);
@@ -223,7 +223,7 @@ function getState(starsCount, currentLevel) {
 				}
 
 				if (this.game.time.now > this.player.changeDirectionInverval){
-					this.player.body.velocity.x = -250;
+					this.player.body.velocity.x = this.player.speed * -1;
 				}
 
 				this.player.playerDirection = 'left';
@@ -244,7 +244,7 @@ function getState(starsCount, currentLevel) {
 				}
 
 				if (this.game.time.now > this.player.changeDirectionInverval) {
-					this.player.body.velocity.x = 250;
+					this.player.body.velocity.x = this.player.speed;
 				}
 
 				this.player.playerDirection = 'right';
@@ -364,15 +364,10 @@ function getState(starsCount, currentLevel) {
 
 		hitPlayer : function(player, enemy) {
 			if ((!player.downHit && player.y  > enemy.y) || (player.downHit && enemy.y + enemy.height >= player.y - player.height/2)) {
-				var damage = 1;
-
-				if (enemy.isBoss != undefined) {
-					enemy.hitPlayer();
-					damage = 2;
-				}
+				
 
 				this.player.animations.play('hit', null, false, true);
-				this.player.damage(damage);
+				this.player.damage(enemy.attack);
 				this.checkGameOver();
 			}
 		},
@@ -408,8 +403,6 @@ function getState(starsCount, currentLevel) {
 		},
 
 		hitEnemy : function(bullet, target) {
-			// console.log(bullet);
-			// console.log(target);
 			target.damage(bullet.damage);
 			bullet.kill();
 		},
@@ -530,6 +523,7 @@ function getState(starsCount, currentLevel) {
 
 game.state.add('load', {
 	preload : function() {
+		//ENEMIES
 		this.game.load.spritesheet('Tick', 'assets/enemies/Tick41x50.png', 50, 41);
 		this.game.load.spritesheet('BrownTeddy', 'assets/enemies/BrownTeddy55x55.png', 55, 55);
 		this.game.load.spritesheet('PandaTeddy', 'assets/enemies/PandaTeddy55x55.png', 55, 55);
@@ -538,42 +532,49 @@ game.state.add('load', {
 		this.game.load.spritesheet('Planey', 'assets/enemies/Planey45x70.png', 70, 45);
 		this.game.load.spritesheet('ToyTrojan', 'assets/enemies/ToyTrojan130x160.png', 160, 130);
 
-		this.game.load.spritesheet('Danny', 'assets/Danny70x70.png', 70, 70);
-		this.game.load.spritesheet('Jessie', 'assets/Jessie70x70.png', 70, 70);
+		//PLAYERS
+		this.game.load.spritesheet('Danny', 'assets/players/Danny70x70.png', 70, 70);
+		this.game.load.spritesheet('Jessie', 'assets/players/Jessie70x70.png', 70, 70);
 
-		this.game.load.spritesheet('Lucas', 'assets/Lucas75x55.png', 55, 75);
+		//NPC
+		this.game.load.spritesheet('Lucas', 'assets/npcs/Lucas75x55.png', 55, 75);
 
-		this.game.load.spritesheet('Coin', 'assets/Money24x25.png', 25, 24);
+		//ITEMS
+		this.game.load.spritesheet('Coin', 'assets/items/Money24x25.png', 25, 24);
 
-		this.game.load.image('platform', 'assets/platform.png');
+		//MAP
+		this.game.load.image('bg1', 'assets/map/bg1.jpg');
+		this.game.load.image('bg2', 'assets/map/bg2.jpg');
+		this.game.load.image('bg3', 'assets/map/bg3.png');
+		this.game.load.image('platform', 'assets/map/platform.png');
 
-		this.game.load.spritesheet('bullet', 'assets/Apples30x30.png', 30, 30);
-		this.game.load.spritesheet('bomb', 'assets/Bombs60x35.png', 35, 60);
+		//BULLETS
+		this.game.load.spritesheet('bullet', 'assets/bullets/Apples30x30.png', 30, 30);
+		this.game.load.spritesheet('bullet2', 'assets/bullets/Balls30x30.png', 30, 30);
+		this.game.load.spritesheet('bomb', 'assets/bullets/Bombs60x35.png', 35, 60);
+		this.game.load.image('bulletEnemy', 'assets/bullets/bullet2.png');
 
-		this.game.load.image('bullet2', 'assets/bullet2.png');
+		//EFFECT
+		this.game.load.spritesheet('explosion', 'assets/effects/explosion.png', 64, 64);
+		
+		//SOUND
+		//
+		
 
-		this.game.load.spritesheet('explosion', 'assets/explosion.png', 64, 64);
-
+		//UI
 		this.game.load.image('heart_empty', 'assets/UI/UI_HEART_EMPTY.png');
 		this.game.load.image('heart_half', 'assets//UI/UI_HEART_HALF.png');
 		this.game.load.image('heart_full', 'assets/UI/UI_HEART_FULL.png');
-
 		this.game.load.image('level_name_background', 'assets/UI/UI_INPUT.png');
-
 		this.game.load.image('mute', 'assets/UI/SYMB_MUTE.png');
 		this.game.load.image('unmute', 'assets/UI/SYMB_VOLUME.png');
 		this.game.load.image('pause', 'assets/UI/SYMB_PAUSE.png');
 		this.game.load.image('play', 'assets/UI/SYMB_PLAY.png');
 		this.game.load.image('replay', 'assets/UI/SYMB_REPLAY.png');
-
-		this.game.load.image('bg1', 'assets/bgs/bg1.jpg');
-		this.game.load.image('bg2', 'assets/bgs/bg2.jpg');
-		this.game.load.image('bg3', 'assets/bgs/bg3.png');
-
 		this.game.load.image('loading', 'assets/UI/loading.png');
 		this.game.load.image('loading2', 'assets/UI/loading2.png');
-
 		this.game.load.image('pause_texture', 'assets/UI/pause_texture.png');
+		
 	},
 	update: function() {
 		this.game.state.add('0', getState(0, 0));

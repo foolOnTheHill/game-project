@@ -18,6 +18,9 @@ var Player = function(x, y, game, sprite, scale, hp) {
 	this.direction = 1;
 	this.HP = hp;
 	this.MAX_HP = 6;
+	this.attack = 1;
+	this.speed = 250;
+	this.defense = 0;
 	this.weapon1;
 	this.weapon2;
 	this.currentWeapon;
@@ -54,7 +57,7 @@ Player.prototype.constructor = Player;
 
 Player.prototype.damage = function(value) {
 	if (!this.tookHit) {
-		this.HP -= value;
+		this.HP -= (value - this.defense);
 		this.tint = 0xec5656;
 		this.tookHit = true;
 		this.hitFlashTime = this.game.time.now + 1200;
@@ -71,8 +74,10 @@ Player.prototype.fire = function() {
 Player.prototype.changeWeapon = function() {
 	if (this.currentWeapon == this.weapon1) {
 		this.currentWeapon = this.weapon2;
+		this.BulletIcon.loadTexture('bullet2');
 	} else {
 		this.currentWeapon = this.weapon1;
+		this.BulletIcon.loadTexture('bullet');
 	}
 };
 

@@ -15,9 +15,10 @@ var EnemyShooter = function(x, y, game, sprite, hp, shootPeriod) {
 	this.tookHit = false;
 
 	this.bullets = this.game.add.group();
-	this.bullets.createMultiple(1000, 'bullet2');
+	this.bullets.createMultiple(1000, 'bulletEnemy');
 
 	this.hp = hp;
+	this.attack = 1;
 };
 
 EnemyShooter.prototype = Object.create(Phaser.Sprite.prototype);

@@ -15,6 +15,7 @@ var EnemyStatic = function(x, y, game, sprite, hp) {
 	this.direction = 'left';
 
 	this.hp = hp;
+	this.attack = 1;
 };
 
 EnemyStatic.prototype = Object.create(Phaser.Sprite.prototype);

@@ -19,6 +19,7 @@ var BossToy = function(x, y, game, hp, sprite) {
 
 	this.max_hp = hp;
 	this.hp = hp;
+	this.attack = 2;
 
 	this.tookHit = false;
 

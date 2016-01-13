@@ -19,6 +19,7 @@ var EnemyFlyer = function(x, y, game, sprite, hp, isDropper, dropPeriod, leftAni
 	this.dropPeriod = dropPeriod;
 	this.dropTime = this.game.time.now + dropPeriod;
 	this.hp = hp;
+	this.attack = 1;
 
 	this.tookHit = false;
 };

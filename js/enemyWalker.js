@@ -14,6 +14,7 @@ var EnemyWalker = function(x, y, game, sprite, hp) {
 	this.direction = 'right';
 
 	this.hp = hp;
+	this.attack = 1;
 
 	this.tookHit = false;
 };

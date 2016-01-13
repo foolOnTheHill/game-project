@@ -132,11 +132,16 @@ Player.prototype.createHearts = function() {
 Player.prototype.updateHearts = function() {
 
 	var numberHearts = Math.ceil(this.MAX_HP / 2);
-
-	var h = this.HP % 2;
-	var e = Math.floor((this.MAX_HP - this.HP) / 2);
-	var f = (numberHearts - h - e);
-
+	
+	if (this.HP > 0) {
+		var h = this.HP % 2;
+		var e = Math.floor((this.MAX_HP - this.HP) / 2);
+		var f = (numberHearts - h - e);
+	} else {
+		var h = 0;
+		var e = numberHearts;
+		var f = 0;
+	}
 	var index = 0;
 	var sprite;
 

@@ -46,7 +46,7 @@ BossToy.prototype.update = function() {
 	if (this.game.physics.arcade.isPaused) {
 		this.animations.stop();
 	}
-
+	
 	this.move();
 };
 
@@ -66,7 +66,7 @@ BossToy.prototype.damage = function(value) {
 	this.tookHit = true;
 	console.log(this.hp);
 
-	this.hp_bar.width *= (this.hp / this.max_hp);
+	this.hp_bar.width = 377 * (this.hp / this.max_hp);
 	if (this.hp <= this.max_hp/2) {
 		this.hp_bar.tint = 0xe51212;
 	}

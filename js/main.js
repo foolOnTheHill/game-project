@@ -50,7 +50,7 @@ function getState(starsCount, currentLevel) {
 
 	var bossLevel = new Level('Boss', [p5, p6, p7, p8], {shooters:[Tick1, Tick2], boss: bossToy}, [], [], width - 100, height - 100, null);
 
-	var levels = [level, bossLevel];
+	var levels = [bossLevel];
 
 	var main = {
 		create : function() {
@@ -98,7 +98,7 @@ function getState(starsCount, currentLevel) {
 
 			// LEVEL
 			this.level = levels[currentLevel];
-			
+
 			// WEAPONS
 			this.weapons = [];
 			this.weapons.push(new Weapon.Basic(this.game, 'bullet'));
@@ -364,7 +364,9 @@ function getState(starsCount, currentLevel) {
 
 		hitPlayer : function(player, enemy) {
 			if ((!player.downHit && player.y  > enemy.y) || (player.downHit && enemy.y + enemy.height >= player.y - player.height/2)) {
-				
+				if (enemy.isBoss) {
+					enemy.hitPlayer();
+				}
 
 				this.player.animations.play('hit', null, false, true);
 				this.player.damage(enemy.attack);
@@ -556,10 +558,10 @@ game.state.add('load', {
 
 		//EFFECT
 		this.game.load.spritesheet('explosion', 'assets/effects/explosion.png', 64, 64);
-		
+
 		//SOUND
 		//
-		
+
 
 		//UI
 		this.game.load.image('heart_empty', 'assets/UI/UI_HEART_EMPTY.png');
@@ -574,7 +576,7 @@ game.state.add('load', {
 		this.game.load.image('loading', 'assets/UI/loading.png');
 		this.game.load.image('loading2', 'assets/UI/loading2.png');
 		this.game.load.image('pause_texture', 'assets/UI/pause_texture.png');
-		
+
 	},
 	update: function() {
 		this.game.state.add('0', getState(0, 0));

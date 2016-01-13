@@ -521,10 +521,29 @@ function getState(starsCount, currentLevel) {
 	};
 
 	return main;
-}
+};
+
+game.state.add('boot', {
+	preload: function() {
+		this.game.load.image('loading', 'assets/UI/loading.png');
+		this.game.load.image('loading2', 'assets/UI/loading2.png');
+	},
+	create: function() {
+		this.game.state.start('load');
+	}
+});
 
 game.state.add('load', {
 	preload : function() {
+
+		var preloading2 = this.game.add.sprite(this.game.world.width/2, this.game.world.height/2, 'loading2');
+		preloading2.x -= (preloading2.width)/2;
+
+		var preloading = this.game.add.sprite((this.game.world.width/2), (this.game.world.height/2)+4, 'loading');
+		preloading.x -= (preloading.width)/2;
+
+		this.game.load.setPreloadSprite(preloading);
+
 		//ENEMIES
 		this.game.load.spritesheet('Tick', 'assets/enemies/Tick41x50.png', 50, 41);
 		this.game.load.spritesheet('BrownTeddy', 'assets/enemies/BrownTeddy55x55.png', 55, 55);
@@ -562,7 +581,6 @@ game.state.add('load', {
 		//SOUND
 		//
 
-
 		//UI
 		this.game.load.image('heart_empty', 'assets/UI/UI_HEART_EMPTY.png');
 		this.game.load.image('heart_half', 'assets//UI/UI_HEART_HALF.png');
@@ -573,8 +591,6 @@ game.state.add('load', {
 		this.game.load.image('pause', 'assets/UI/SYMB_PAUSE.png');
 		this.game.load.image('play', 'assets/UI/SYMB_PLAY.png');
 		this.game.load.image('replay', 'assets/UI/SYMB_REPLAY.png');
-		this.game.load.image('loading', 'assets/UI/loading.png');
-		this.game.load.image('loading2', 'assets/UI/loading2.png');
 		this.game.load.image('pause_texture', 'assets/UI/pause_texture.png');
 
 	},
@@ -584,4 +600,4 @@ game.state.add('load', {
 	}
 });
 
-game.state.start('load');
+game.state.start('boot');

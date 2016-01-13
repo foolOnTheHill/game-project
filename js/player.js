@@ -79,6 +79,7 @@ Player.prototype.changeWeapon = function() {
 		this.currentWeapon = this.weapon1;
 		this.BulletIcon.loadTexture('bullet');
 	}
+	this.updateBullets();
 };
 
 Player.prototype.updateHPText = function() {

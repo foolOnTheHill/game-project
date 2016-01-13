@@ -117,6 +117,13 @@ function getState(starsCount, currentLevel) {
 			this.isBossLevel = true;
 			this.boss = null;
 
+			this.game.player = this.player;
+
+			this.loadLevel();
+
+			this.pause_texture = this.game.add.image(0, 0, 'pause_texture');
+			this.pause_texture.visible = false;
+
 			this.replayButton = this.game.add.image(this.game.world.width - 70, 15, 'replay');
 			this.replayButton.scale.setTo(0.6	, 0.6);
 			this.replayButton.inputEnabled = true;
@@ -132,11 +139,6 @@ function getState(starsCount, currentLevel) {
 			this.muteButton.scale.setTo(0.6	, 0.6);
 			this.muteButton.inputEnabled = true;
 			this.muteButton.events.onInputDown.add(this.mute, this);
-
-			this.game.player = this.player;
-
-			this.loadLevel();
-
 		},
 
 		mute: function() {
@@ -159,6 +161,11 @@ function getState(starsCount, currentLevel) {
 
 		pauseGame: function() {
 			 this.game.physics.arcade.isPaused = (this.game.physics.arcade.isPaused) ? false : true;
+			 if (this.game.physics.arcade.isPaused) {
+				 this.pause_texture.visible = true;
+			 } else {
+				 this.pause_texture.visible = false;
+			 }
 		},
 
 		setFloor : function() {
@@ -539,18 +546,11 @@ game.state.add('load', {
 		this.game.load.spritesheet('Coin', 'assets/Money24x25.png', 25, 24);
 
 		this.game.load.image('platform', 'assets/platform.png');
-		//this.game.load.image('bullet', 'assets/bullet.png');
-
-		this.game.load.image('sky', 'assets/test/sky.png');
-		this.game.load.image('shopbackground', 'assets/ShopBackground.jpg');
-		this.game.load.image('ground', 'assets/test/platform.png');
 
 		this.game.load.spritesheet('bullet', 'assets/Apples30x30.png', 30, 30);
 		this.game.load.spritesheet('bomb', 'assets/Bombs60x35.png', 35, 60);
 
-		this.game.load.image('bullet2', 'assets/test/bullet2.png');
-		this.game.load.image('player', 'assets/test/player.png');
-		this.game.load.image('enemy', 'assets/test/enemy.png');
+		this.game.load.image('bullet2', 'assets/bullet2.png');
 
 		this.game.load.spritesheet('explosion', 'assets/explosion.png', 64, 64);
 
@@ -572,6 +572,8 @@ game.state.add('load', {
 
 		this.game.load.image('loading', 'assets/UI/loading.png');
 		this.game.load.image('loading2', 'assets/UI/loading2.png');
+
+		this.game.load.image('pause_texture', 'assets/UI/pause_texture.png');
 	},
 	update: function() {
 		this.game.state.add('0', getState(0, 0));

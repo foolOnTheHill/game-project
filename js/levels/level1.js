@@ -12,7 +12,7 @@ var enemiesList = {
   flyers: [Helly]
 };
 
-var i1 = new Item(350, 30, 'heart');
+var i1 = new Item(350, 30, 'balls');
 var itemList = [i1];
 
 var p1 = new Platform(width / 2, height - 162, 1, false);

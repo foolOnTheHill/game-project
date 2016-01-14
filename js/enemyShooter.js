@@ -82,6 +82,7 @@ EnemyShooter.prototype.shoot = function() {
 			b.body.allowGravity = false;
 			b.checkWorldBounds = true;
 			b.outOfBoundsKill = true;
+			b.animations.add('fly', [0, 1, 2, 3], 8, true);
 
 			if (this.direction == 'left') {
 				b.reset(this.x - this.width + 30, this.y + this.width/4 + 5);
@@ -90,6 +91,7 @@ EnemyShooter.prototype.shoot = function() {
 				b.reset(this.x + this.width, this.y + this.width/4 + 5);
 				b.body.velocity.x = 300;
 			}
+			b.animations.play('fly');
 		}
 		this.shootTime = this.game.time.now + this.shootPeriod;
 	}

@@ -404,6 +404,12 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 				this.player.powerUp('speed');
 			} else if (item.type == 'heart') {
 				this.player.upgradeHP();
+			} else if (item.type == 'apples') {
+				this.player.weapon1.bullets += 10;
+				this.player.updateBullets();
+			} else if (item.type == 'balls') {
+				this.player.weapon2.bullets += 2;
+				this.player.updateBullets();
 			}
 			item.kill();
 		},
@@ -509,7 +515,13 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 		loadItems: function(itemList) {
 			for (var i = 0; itemList != undefined && i <  itemList.length; i++) {
 				var w = itemList[i];
-				this.items.add(new ItemType(w.x, w.y, this.game, w.type, 'items'));
+				if (w.type == 'apples') {
+					this.items.add(new ItemType(w.x, w.y, this.game, w.type, 'bullet'));
+				} else if (w.type == 'balls') {
+					this.items.add(new ItemType(w.x, w.y, this.game, w.type, 'bullet2'));
+				} else {
+					this.items.add(new ItemType(w.x, w.y, this.game, w.type, 'items'));
+				}
 				
 				
 			}
@@ -589,7 +601,7 @@ game.state.add('load', {
 		this.game.load.spritesheet('bullet', 'assets/bullets/Apples30x30.png', 30, 30);
 		this.game.load.spritesheet('bullet2', 'assets/bullets/Balls30x30.png', 30, 30);
 		this.game.load.spritesheet('bomb', 'assets/bullets/Bombs60x35.png', 35, 60);
-		this.game.load.image('bulletEnemy', 'assets/bullets/bullet2.png');
+		this.game.load.spritesheet('bulletEnemy', 'assets/bullets/TickShot15x15.png', 15, 15);
 		
 		
 		//EFFECT

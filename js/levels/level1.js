@@ -27,7 +27,7 @@ var Level1_3 = new Level('Level 1-3', [p3, p4, p5, p6], {walkers:[Teddy1]}, star
 
 // LEVEL 1-4
 var Tick1 = new Shooter(width / 2 - 25, height - 390, 'Tick', 2, 2000);
-var Level1_4 = new Level('Level 1-3', [p3, p4, p5, p6], {walkers:[Teddy1], shooters:[Tick1]}, starsList2, [], 10, height-70, exit3)
+var Level1_4 = new Level('Level 1-4', [p3, p4, p5, p6], {walkers:[Teddy1], shooters:[Tick1]}, starsList2, [], 10, height-70, exit3)
 
 // LEVEL 1-5
 var p7 = new Platform(860, height-162, 5.5, false);

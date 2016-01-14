@@ -628,6 +628,8 @@ game.state.add('load', {
 		//TUTS
 		this.game.load.image('moves_tutorial', 'assets/tutorials/moves_tutorial.png');
 		this.game.load.image('itens_tutorial', 'assets/tutorials/itens_tutorial.png');
+		this.game.load.image('tutorial_bg', 'assets/tutorials/tuto_bg.png');
+		this.game.load.image('text_box', 'assets/tutorials/text_box.png');
 	},
 	update: function() {
 		this.game.state.start('start');
@@ -660,6 +662,9 @@ game.state.add('createPlayer', {
 	create: function() {
 		this.game.stage.backgroundColor = 0xB3A82D;//0xeefa32;
 
+		this.bg = this.game.add.image(0, 0, 'tutorial_bg');
+		this.bg.scale.setTo(2, 1);
+
 		this.buffer = [
 			"Hey...",
 			"Hey...",
@@ -689,22 +694,30 @@ game.state.add('createPlayer', {
 		this.boySelected = false;
 		this.girlSelected = false;
 		this.story = false;
-		this.storyCompleted = true;
+		this.storyCompleted = false;
 
 		this.addBoyOrGirl();
 	},
 
 	playStory: function() {
 		if (!this.storyText) {
+			this.text_box = this.game.add.image(50, this.game.world.height/2 - 250, 'text_box');
+			this.text_box.width = 910;
+
+			this.next_btn = this.game.add.image(795, this.game.world.height/2 + 75, 'text_next');
+			this.next_btn.scale.setTo(0.7, 0.7);
+
+			this.next_btn.inputEnabled = true;
+			this.next_btn.events.onInputDown.add(function() {
+				this.game.add.tween(this.next_btn.scale).to({ x:0.5, y:0.5 }, 100).to({x:0.7, y:0.7}, 100).start();
+				this.playStory();
+			}, this);
+
 			var style = { font: 'bold 60px Arial', fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 850 };
 			this.storyText = this.game.add.text(100, this.game.world.height/2 - 50, '', style);
 			this.storyText.anchor.setTo(0, 0.5);
 			this.storyText.setShadow(1, 1, '#000000', 5);
 
-			this.storyText.inputEnabled = true;
-			this.storyText.events.onInputDown.add(function() {
-				this.playStory();
-			}, this);
 			this.story = true;
 		}
 		if (this.currentText >= this.buffer.length) {
@@ -716,7 +729,7 @@ game.state.add('createPlayer', {
 	},
 
 	addLucas: function() {
-		this.lucas = this.game.add.image(this.game.world.width/2 + 500, this.game.world.height/2, 'Lucas');
+		this.lucas = this.game.add.image(this.game.world.width/2 + 500, this.game.world.height/2 - 50, 'Lucas');
 		this.lucas.anchor.setTo(0.5, 0.5);
 		this.lucas.scale.setTo(5, 5);
 		this.lucas.animations.add('blink', [0, 1], 0.8, true);
@@ -806,6 +819,7 @@ game.state.add('tutorials', {
 		this.nextButton.anchor.setTo(0.5, 0.5);
 		this.nextButton.inputEnabled = true;
 		this.nextButton.events.onInputDown.add(function() {
+			this.game.add.tween(this.nextButton.scale).to({ x:0.8, y:0.8 }, 100).to({x:1, y:1}, 100).start();
 			if (this.tutorialId == 0) {
 				this.tutorialImg.loadTexture('itens_tutorial');
 				this.nextButton.loadTexture('text_start');

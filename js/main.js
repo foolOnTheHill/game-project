@@ -419,10 +419,10 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 			} else if (item.type == 'heart') {
 				this.player.upgradeHP();
 			} else if (item.type == 'apples') {
-				this.player.weapon1.bullets += 10;
+				this.player.weapon1.bullets += 15;
 				this.player.updateBullets();
 			} else if (item.type == 'balls') {
-				this.player.weapon2.bullets += 2;
+				this.player.weapon2.bullets += 3;
 				this.player.updateBullets();
 			}
 			item.kill();
@@ -871,9 +871,9 @@ game.state.add('tutorials', {
 	},
 
 	startGame: function() {
-		this.game.bgs.play()
+		this.game.bgs.play();
 
-		this.game.state.add('0', getState(0, [100, 10], [6, 6], 0));
+		this.game.state.add('0', getState(0, [30, 5], [6, 6], 0));
 		this.game.state.start('0');
 	}
 });

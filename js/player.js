@@ -88,23 +88,26 @@ Player.prototype.update = function() {
 	}
 
 	//Debug Stats
-	console.log("HP: " + this.HP + "/" + this.MAX_HP + " Attack: " + this.attack + " Defense: " + this.defense + " Speed: " + this.speed);
+	//console.log("HP: " + this.HP + "/" + this.MAX_HP + " Attack: " + this.attack + " Defense: " + this.defense + " Speed: " + this.speed);
 };
 
 Player.prototype.damage = function(value) {
 	if (!this.tookHit) {
-		this.hurt_sound.play();
+		if (value > this.defense) {
+			this.hurt_sound.play();
 
-		this.HP -= (value - this.defense);
-		this.tint = 0xec5656;
-		this.tookHit = true;
-		this.hitFlashTime = this.game.time.now + 1200;
-
-		if (this.HP == 1) {
-			this.low_hp.play();
+			this.HP -= (value - this.defense);
+			this.tint = 0xec5656;
+			this.tookHit = true;
+			this.hitFlashTime = this.game.time.now + 1200;
+	
+			if (this.HP == 1) {
+				this.low_hp.play();
+			}
+	
+			this.updateHearts();
 		}
-
-		this.updateHearts();
+	
 		//console.log(this.hp);
 		//this.timer = this.game.time.events.add(Phaser.Timer.SECOND * 4, this.testPU, this);
 		//this.timer.pause();
@@ -218,24 +221,32 @@ Player.prototype.powerUp = function(powerUp) {
 	this.powerUpEnd();
 	this.timer.destroy();
 	this.timer = this.game.time.create(false);
-	this.timer.add(this.powerUpDuration * 1000, this.powerUpEnd, this);
-	this.timer.start();
-
+	
 	if (powerUp == 'defense') {
+		this.tint = 0xec5656;
 		this.defense += 1;
+		this.powerUpDuration = 5;
 		//console.log("Defense Up picked!");
 	} else if (powerUp == 'speed') {
+		this.powerUpDuration = 10;
 		//console.log("Speed Up picked!");
 		this.speed += 100;
 	} else if (powerUp == 'attack') {
+		this.powerUpDuration = 10;
 		//console.log("Attack Up picked!");
 		this.attack += 1;
 	}
+	
+	this.timer.add(this.powerUpDuration * 1000, this.powerUpEnd, this);
+	this.timer.start();
 
 };
 
 Player.prototype.powerUpEnd = function() {
 	//console.log("Power Up ended!");
+	if (this.defense == 1) {
+		this.tint = this.tint = 0xffffff;;
+	}
 	this.attack = this.baseAttack;
 	this.defense = this.baseDefense;
 	this.speed = this.baseSpeed;

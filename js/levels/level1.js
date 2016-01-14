@@ -12,6 +12,9 @@ var enemiesList = {
   flyers: [Helly]
 };
 
+var i1 = new Item(350, 30, 'heart');
+var itemList = [i1];
+
 var p1 = new Platform(width / 2, height - 162, 1, false);
 var p2 = new Platform(width / 2, height - 299, 1, false);
 var p3 = new Platform(width / 2 + 350, height - 259, 0.7, false);
@@ -24,7 +27,7 @@ var starsList = [star1, star2];
 
 var exit = new Exit(width / 2 - 445, height - 469, -1);
 
-var level = new Level('Level 1-1', platformsList, enemiesList, starsList, [], 70, height - 100, exit);
+var level = new Level('Level 1-1', platformsList, enemiesList, starsList, itemList, 70, height - 100, exit);
 
 // BOSS
 var p5 = new Platform(width/2 - 260, height - 110, 1, false);

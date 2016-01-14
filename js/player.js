@@ -78,7 +78,7 @@ Player.prototype.update = function() {
 	}
 	
 	//Debug Stats
-	//console.log("HP: " + this.HP + "/" + this.MAX_HP + " Attack: " + this.attack + " Defense: " + this.defense + " Speed: " + this.speed);
+	console.log("HP: " + this.HP + "/" + this.MAX_HP + " Attack: " + this.attack + " Defense: " + this.defense + " Speed: " + this.speed);
 	
 };
 
@@ -89,7 +89,7 @@ Player.prototype.damage = function(value) {
 		this.tookHit = true;
 		this.hitFlashTime = this.game.time.now + 1200;
 		this.updateHearts();
-		
+		//console.log(this.hp);
 		//this.timer = this.game.time.events.add(Phaser.Timer.SECOND * 4, this.testPU, this);
 		//this.timer.pause();
 		
@@ -204,19 +204,19 @@ Player.prototype.powerUp = function(powerUp) {
 	
 	if (powerUp == 'defense') {
 		this.defense += 1;
-		console.log("Defense Up picked!");
+		//console.log("Defense Up picked!");
 	} else if (powerUp == 'speed') {
-		console.log("Speed Up picked!");
+		//console.log("Speed Up picked!");
 		this.speed += 100;
 	} else if (powerUp == 'attack') {
-		console.log("Attack Up picked!");
+		//console.log("Attack Up picked!");
 		this.attack += 1;
 	}
 	
 };
 
 Player.prototype.powerUpEnd = function() {
-	console.log("Power Up ended!");
+	//console.log("Power Up ended!");
 	this.attack = this.baseAttack;
 	this.defense = this.baseDefense;
 	this.speed = this.baseSpeed;

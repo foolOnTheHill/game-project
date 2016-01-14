@@ -15,7 +15,7 @@ var player;
 var boy = false;
 var girl = false;
 
-function getState(starsCount, currentLevel) {
+function getState(starsCount, currentBullets, currentHP, currentLevel) {
 
 	var levels = [level, bossLevel];
 
@@ -59,6 +59,9 @@ function getState(starsCount, currentLevel) {
 
 			// ENEMIES
 			this.enemies = this.game.add.group();
+			
+			//ITEMS
+			this.items = this.game.add.group();
 
 			// EXIT
 			this.exit = new EnemyStatic(0, 0, this.game, 'Lucas', 0);
@@ -72,7 +75,7 @@ function getState(starsCount, currentLevel) {
 			this.weapons.push(new Weapon.Cannon(this.game, 'bullet2'));
 
 			//PLAYER
-			var playerSprite = boy ? 'Danny' : 'Jessie'
+			var playerSprite = boy ? 'Danny' : 'Jessie';
 			this.player = new Player(this.level.playerX, this.level.playerY, this.game, playerSprite, scale, 6);
 			this.player.weapon1 = this.weapons[0];
 			this.player.weapon2 = this.weapons[1];
@@ -272,6 +275,9 @@ function getState(starsCount, currentLevel) {
 
 			this.game.physics.arcade.collide(this.stars, this.platforms);
 			this.game.physics.arcade.collide(this.stars, this.floor);
+			
+			this.game.physics.arcade.collide(this.items, this.platforms);
+			this.game.physics.arcade.collide(this.items, this.floor);
 
 			this.game.physics.arcade.collide(this.platforms, this.player, function(player, plt){
 				if (plt.fall && (player.y < plt.y) && (player.x > plt.x - plt.width/2) && (player.x < plt.x + plt.width/2)) {
@@ -295,6 +301,7 @@ function getState(starsCount, currentLevel) {
 			this.game.physics.arcade.overlap(this.player, this.bombs, this.hitBomb, null, this);
 			this.game.physics.arcade.overlap(this.player, this.enemies, this.hitPlayer, null, this);
 			this.game.physics.arcade.overlap(this.player, this.stars, this.collectStar, null, this);
+			this.game.physics.arcade.overlap(this.player, this.items, this.pickItem, null, this);
 
 			this.game.physics.arcade.overlap(this.player, this.exit, this.nextLevel, null, this);
 
@@ -307,8 +314,11 @@ function getState(starsCount, currentLevel) {
 
 		nextLevel: function() {
 			var stars = this.player.stars;
+			var bullets = [this.player.weapon1.bullets, this.player.weapon2.bullets];
+			var hp = [this.player.HP, this.player.MAX_HP];
+			console.log(hp);
 			var nextLvl = currentLevel+1;
-			var next = getState(stars, nextLvl);
+			var next = getState(stars, bullets, hp, nextLvl);
 			this.game.state.add(''+nextLvl, next);
 			this.game.state.start(''+nextLvl);
 		},
@@ -384,6 +394,19 @@ function getState(starsCount, currentLevel) {
 				this.restartLevel();
 			}
 		},
+		
+		pickItem : function(player, item) {
+			if (item.type == 'first aid') {
+				this.player.recover(2);
+			} else if (item.type == 'defense') {
+				this.player.powerUp('defense');
+			} else if (item.type == 'speed') {
+				this.player.powerUp('speed');
+			} else if (item.type == 'heart') {
+				this.player.upgradeHP();
+			}
+			item.kill();
+		},
 
 		loadLevel: function() {
 			if (this.levelNameBackground) this.levelNameBackground.destroy();
@@ -393,6 +416,17 @@ function getState(starsCount, currentLevel) {
 
 			this.player.stars = starsCount;
 			this.player.updateStars();
+			
+			this.player.weapon1.bullets = currentBullets[0];
+			this.player.weapon2.bullets = currentBullets[1];
+			this.player.updateBullets();
+		
+			for (var i = 0; i < (currentHP[1] - 6) / 2; i++) {
+				this.player.upgradeHP();
+			}
+			
+			this.player.HP = currentHP[0];
+			this.player.updateHearts();
 
 			this.levelNameBackground = this.game.add.image(this.game.world.width/2, 30 * scale, 'level_name_background');
 			this.levelNameBackground.anchor.setTo(0.5, 0.5);
@@ -406,6 +440,8 @@ function getState(starsCount, currentLevel) {
 			this.loadPlatforms(level.platformsList);
 
 			this.loadEnemies(level.enemiesList);
+			
+			this.loadItems(level.itensList);
 
 			if (level.enemiesList.hasOwnProperty('boss')) {
 				this.loadBoss(level.enemiesList.boss);
@@ -432,7 +468,7 @@ function getState(starsCount, currentLevel) {
 			this.platforms.forEachAlive(function(p) {
 				p.kill();
 			});
-
+		
 			for(var i = 0; i < platformsList.length; i++) {
 				var plt = platformsList[i];
 				var p = this.platforms.getFirstDead();
@@ -467,6 +503,15 @@ function getState(starsCount, currentLevel) {
 			for (var i = 0; enemiesList.flyers != undefined && i < enemiesList.flyers.length; i++) {
 				var w = enemiesList.flyers[i];
 				this.enemies.add(new EnemyFlyer(w.x, w.y, this.game, w.sprite, w.hp, w.isDropper, w.dropPeriod, w.leftAnimation, w.rightAnimation, w.lhitAnimation, w.rhitAnimation));
+			}
+		},
+		
+		loadItems: function(itemList) {
+			for (var i = 0; itemList != undefined && i <  itemList.length; i++) {
+				var w = itemList[i];
+				this.items.add(new ItemType(w.x, w.y, this.game, w.type, 'items'));
+				
+				
 			}
 		},
 
@@ -532,6 +577,7 @@ game.state.add('load', {
 
 		//ITEMS
 		this.game.load.spritesheet('Coin', 'assets/items/Money24x25.png', 25, 24);
+		this.game.load.spritesheet('items', 'assets/items/Consumable Items30x30.png', 30, 30);
 
 		//MAP
 		this.game.load.image('bg1', 'assets/map/bg1.jpg');
@@ -544,7 +590,8 @@ game.state.add('load', {
 		this.game.load.spritesheet('bullet2', 'assets/bullets/Balls30x30.png', 30, 30);
 		this.game.load.spritesheet('bomb', 'assets/bullets/Bombs60x35.png', 35, 60);
 		this.game.load.image('bulletEnemy', 'assets/bullets/bullet2.png');
-
+		
+		
 		//EFFECT
 		this.game.load.spritesheet('explosion', 'assets/effects/explosion.png', 64, 64);
 
@@ -630,10 +677,11 @@ game.state.add('createPlayer', {
 		this.boySelected = false;
 		this.girlSelected = false;
 		this.story = false;
-		this.storyCompleted = false;
+		this.storyCompleted = true;
 
 		this.addBoyOrGirl();
 	},
+	
 	playStory: function() {
 		if (!this.storyText) {
 			var style = { font: 'bold 60px Arial', fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 850 };
@@ -644,7 +692,7 @@ game.state.add('createPlayer', {
 			this.storyText.inputEnabled = true;
 			this.storyText.events.onInputDown.add(function() {
 				this.playStory();
-			}, this)
+			}, this);
 			this.story = true;
 		}
 		if (this.currentText >= this.buffer.length) {
@@ -654,6 +702,7 @@ game.state.add('createPlayer', {
 			this.currentText += 1;
 		}
 	},
+	
 	addLucas: function() {
 		this.lucas = this.game.add.image(this.game.world.width/2 + 500, this.game.world.height/2, 'Lucas');
 		this.lucas.anchor.setTo(0.5, 0.5);
@@ -663,6 +712,7 @@ game.state.add('createPlayer', {
 
 		this.playStory();
 	},
+	
 	addBoyOrGirl: function() {
 		this.question = this.game.add.text(this.game.world.width/2, 80, 'Are you a boy or a girl?', {
 			font : '70px "Arial"',
@@ -693,6 +743,7 @@ game.state.add('createPlayer', {
 			this.girlSelected = true;
 		}, this);
 	},
+	
 	update: function() {
 		if ((this.boySelected || this.girlSelected) && !this.story && !this.storyCompleted) {
 			this.question.destroy();
@@ -703,6 +754,7 @@ game.state.add('createPlayer', {
 			this.startGame();
 		}
 	},
+	
 	startGame: function() {
 		boy = this.boy;
 		girl = this.girl;
@@ -753,8 +805,9 @@ game.state.add('tutorials', {
 			}
 		}, this);
 	},
+	
 	startGame: function() {
-		this.game.state.add('0', getState(0, 0));
+		this.game.state.add('0', getState(0, [100, 10], [6, 6], 0));
 		this.game.state.start('0');
 	}
 });

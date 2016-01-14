@@ -16,7 +16,7 @@ var Player = function(x, y, game, sprite, scale, hp) {
 	this.changeDirectionInverval = -1;
 
 	this.direction = 1;
-	
+
 	this.HP = hp;
 	this.MAX_HP = 6;
 	this.baseAttack = 1;
@@ -26,7 +26,7 @@ var Player = function(x, y, game, sprite, scale, hp) {
 	this.baseDefense = 0;
 	this.defense = 0;
 	this.powerUpDuration = 5;
-	
+
 	this.weapon1;
 	this.weapon2;
 	this.currentWeapon;
@@ -55,11 +55,21 @@ var Player = function(x, y, game, sprite, scale, hp) {
 		fill : '#FFFFFF'
 	});
 	this.StarsText.setShadow(3, 3, '#000000', 5);
-			
+
 	this.timer = this.game.time.create(false);
 	this.timer.add(2000, this.powerUpEnd, this);
 	this.timer.start();
 
+	this.coin_sound = this.game.add.sound('coin-sound');
+	this.coin_sound.volume = 0.7;
+
+	this.powerup_sound = this.game.add.sound('powerup');
+
+	this.hurt_sound = this.game.add.sound('player-hit');
+	this.hurt_sound.volume = 0.6;
+
+	this.low_hp = this.game.add.sound('low-hp');
+	this.low_hp.loop = true;
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -76,25 +86,32 @@ Player.prototype.update = function() {
 			this.tookHit = false;
 		}
 	}
-	
+
 	//Debug Stats
 	console.log("HP: " + this.HP + "/" + this.MAX_HP + " Attack: " + this.attack + " Defense: " + this.defense + " Speed: " + this.speed);
-	
+
 };
 
 Player.prototype.damage = function(value) {
 	if (!this.tookHit) {
+		this.hurt_sound.play();
+
 		this.HP -= (value - this.defense);
 		this.tint = 0xec5656;
 		this.tookHit = true;
 		this.hitFlashTime = this.game.time.now + 1200;
+
+		if (this.HP == 1) {
+			this.low_hp.play();
+		}
+
 		this.updateHearts();
 		//console.log(this.hp);
 		//this.timer = this.game.time.events.add(Phaser.Timer.SECOND * 4, this.testPU, this);
 		//this.timer.pause();
-		
+
 	}
-	
+
 };
 
 Player.prototype.fire = function() {
@@ -116,6 +133,7 @@ Player.prototype.changeWeapon = function() {
 
 
 Player.prototype.recover = function(r) {
+	this.low_hp.stop();
 	this.HP = Math.min(this.MAX_HP, this.HP + r);
 	this.updateHearts();
 };
@@ -146,7 +164,7 @@ Player.prototype.createHearts = function() {
 Player.prototype.updateHearts = function() {
 
 	var numberHearts = Math.ceil(this.MAX_HP / 2);
-	
+
 	if (this.HP > 0) {
 		var h = this.HP % 2;
 		var e = Math.floor((this.MAX_HP - this.HP) / 2);
@@ -185,6 +203,8 @@ Player.prototype.updateStars = function() {
 };
 
 Player.prototype.collectStar = function() {
+	this.coin_sound.play();
+
 	this.stars += 1;
 	this.updateStars();
 };
@@ -195,13 +215,14 @@ Player.prototype.addBullets = function(value) {
 };
 
 Player.prototype.powerUp = function(powerUp) {
-	
+	this.powerup_sound.play();
+
 	this.powerUpEnd();
 	this.timer.destroy();
 	this.timer = this.game.time.create(false);
 	this.timer.add(this.powerUpDuration * 1000, this.powerUpEnd, this);
 	this.timer.start();
-	
+
 	if (powerUp == 'defense') {
 		this.defense += 1;
 		//console.log("Defense Up picked!");
@@ -212,7 +233,7 @@ Player.prototype.powerUp = function(powerUp) {
 		//console.log("Attack Up picked!");
 		this.attack += 1;
 	}
-	
+
 };
 
 Player.prototype.powerUpEnd = function() {

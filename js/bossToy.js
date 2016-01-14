@@ -37,6 +37,9 @@ var BossToy = function(x, y, game, hp, sprite) {
 	this.hp_bar.width = 377;
 	this.hp_bar.height = 12;
 	this.hp_bar.tint = 0x0eb808;
+
+	this.hurt_sound = this.game.add.sound('enemy-hit');
+	this.dash_sound = this.game.add.sound('boss-dash');
 };
 
 BossToy.prototype = Object.create(Phaser.Sprite.prototype);
@@ -46,7 +49,7 @@ BossToy.prototype.update = function() {
 	if (this.game.physics.arcade.isPaused) {
 		this.animations.stop();
 	}
-	
+
 	this.move();
 };
 
@@ -58,6 +61,8 @@ BossToy.prototype.damage = function(value) {
 	if (this.stuned) {
 		value *= 2;
 	}
+
+	this.hurt_sound.play();
 
 	this.hp -= value;
 	if (this.hp <= 0) {
@@ -88,7 +93,7 @@ BossToy.prototype.move = function() {
 		var right = this.x == this.game.world.width - this.width;
 
 		if (left || right) {
-			
+
 			this.stuned = true;
 			this.dashing = false;
 
@@ -147,6 +152,8 @@ BossToy.prototype.move = function() {
 };
 
 BossToy.prototype.dash = function() {
+	this.dash_sound.play();
+
 	if (this.direction == 'left') {
 		this.body.velocity.x = -500;
 		this.animations.play('ldash');
@@ -162,7 +169,7 @@ BossToy.prototype.spawnEnemy = function() {
 };
 
 BossToy.prototype.playerDetected = function() {
-	
+
 	var ldetect = this.game.player.x < this.x && Math.abs(this.game.player.x - this.x) < 500 && this.direction == 'left';
 	var rdetect = this.game.player.x > (this.x + this.width) && Math.abs(this.game.player.x - this.x) < 500 && this.direction == 'right';
 	return (rdetect || ldetect) && this.y - this.game.player.y < 0;

@@ -1,6 +1,6 @@
 
-var height = Math.min(window.innerHeight, 650);
-var width = Math.round(2.07 * height);
+var height = 650;
+var width = 1346;
 
 var emptyEnemiesList = {walkers: [], shooters: [], flyers: []};
 

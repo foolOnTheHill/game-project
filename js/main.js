@@ -1,7 +1,7 @@
 "use strict";
 
-var height = Math.min(window.innerHeight, 650);
-var width = Math.round(2.07 * height);
+var height = 650;
+var width = 1346;
 
 var scale = height / 650;
 
@@ -107,7 +107,7 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 			this.pauseButton.inputEnabled = true;
 			this.pauseButton.events.onInputDown.add(this.pauseGame, this);
 
-			this.isMute = false;
+			this.isMute = true;
 			this.muteButton = this.game.add.image(this.game.world.width - 65, this.game.world.height - 76, 'unmute');
 			this.muteButton.scale.setTo(0.6	, 0.6);
 			this.muteButton.inputEnabled = true;
@@ -115,16 +115,13 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 		},
 
 		mute: function() {
-			this.muteButton.destroy();
-
 			if (this.isMute) {
-				this.muteButton = this.game.add.image(this.game.world.width - 65, this.game.world.height - 69, 'mute');
+				this.game.bgs.volume = 0;
+				this.muteButton.loadTexture('mute');
 			} else {
-				this.muteButton = this.game.add.image(this.game.world.width - 65, this.game.world.height - 76, 'unmute');
+				this.game.bgs.volume = 1;
+				this.muteButton.loadTexture('unmute');
 			}
-			this.muteButton.scale.setTo(0.6	, 0.6);
-			this.muteButton.inputEnabled = true;
-			this.muteButton.events.onInputDown.add(this.mute, this);
 			this.isMute = !this.isMute;
 		},
 
@@ -245,6 +242,8 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 			}
 
 			if (this.jumpButton.isDown && !this.cursors.down.isDown && this.player.body.touching.down && this.game.time.now > this.jumpTime) {
+				this.game.jump_sound.play();
+
 				this.player.body.velocity.y = -400;
 				this.jumpTime = this.game.time.now + 800;
 			}
@@ -366,6 +365,7 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 		},
 
 		hitBomb : function(player, bomb) {
+			this.game.explosion.play();
 			bomb.kill();
 			this.player.damage(1);
 			this.checkGameOver();
@@ -379,6 +379,7 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 			var e = this.game.add.sprite(bomb.x, bomb.y, 'explosion');
 			e.animations.add('explode', [0, 1, 2, 3, 21, 22], 20, false);
 			e.animations.play('explode', null, false, true);
+			this.game.explosion.play();
 			bomb.kill();
 		},
 
@@ -387,6 +388,7 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 		},
 
 		hitEnemy : function(bullet, target) {
+			this.game.enemy_hit.play();
 			target.damage(bullet.damage);
 			bullet.kill();
 		},
@@ -467,6 +469,12 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 		},
 
 		loadBoss: function(boss) {
+			this.game.bgs.stop();
+			this.game.bgs = this.game.add.audio('boss-theme');
+			this.game.bgs.loop = true;
+			this.game.bgs.volume = 0.8;
+			this.game.bgs.play();
+
 			var bossToy = new BossToy(boss.x, boss.y, this.game, boss.hp, boss.sprite);
 			this.boss = bossToy;
 			this.isBossLevel = true;
@@ -608,7 +616,17 @@ game.state.add('load', {
 		this.game.load.spritesheet('explosion', 'assets/effects/explosion.png', 64, 64);
 
 		//SOUND
-		//
+		this.game.load.audio('coin-sound', 'assets/sounds/coin.mp3');
+		this.game.load.audio('powerup', 'assets/sounds/powerup.wav');
+		this.game.load.audio('enemy-hit', 'assets/sounds/enemy_hit.wav');
+		this.game.load.audio('player-hit', 'assets/sounds/hit.wav');
+		this.game.load.audio('jump', 'assets/sounds/jump.wav');
+		this.game.load.audio('bomb-explosion', 'assets/sounds/explosion.wav');
+		this.game.load.audio('low-hp', 'assets/sounds/low_hp.wav');
+		this.game.load.audio('level-theme', 'assets/sounds/spring-yard-zone.mp3');
+		this.game.load.audio('boss-theme', 'assets/sounds/final-boss-theme.mp3');
+		this.game.load.audio('boss-dash', 'assets/sounds/boss-dash.wav');
+		this.game.load.audio('throw', 'assets/sounds/throw.mp3');
 
 		//UI
 		this.game.load.image('heart_empty', 'assets/UI/UI_HEART_EMPTY.png');
@@ -625,11 +643,21 @@ game.state.add('load', {
 		this.game.load.image('text_next', 'assets/UI/TEXT_NEXT.png');
 		this.game.load.image('logo', 'assets/UI/beat_em_mall.png');
 
-		//TUTS
 		this.game.load.image('moves_tutorial', 'assets/tutorials/moves_tutorial.png');
 		this.game.load.image('itens_tutorial', 'assets/tutorials/itens_tutorial.png');
 		this.game.load.image('tutorial_bg', 'assets/tutorials/tuto_bg.png');
 		this.game.load.image('text_box', 'assets/tutorials/text_box.png');
+	},
+	create: function() {
+		this.game.bgs = this.game.add.sound('level-theme');
+		this.game.bgs.loop = true;
+
+		this.game.boss_theme = this.game.add.sound('boss-theme');
+		this.game.boss_theme.loop = true;
+
+		this.game.jump_sound = this.game.add.sound('jump');
+		this.game.explosion = this.game.add.sound('bomb-explosion');
+		this.game.enemy_hit = this.game.add.sound('enemy-hit');
 	},
 	update: function() {
 		this.game.state.start('start');
@@ -833,6 +861,8 @@ game.state.add('tutorials', {
 	},
 
 	startGame: function() {
+		this.game.bgs.play()
+
 		this.game.state.add('0', getState(0, [100, 10], [6, 6], 0));
 		this.game.state.start('0');
 	}

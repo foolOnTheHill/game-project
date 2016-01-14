@@ -24,9 +24,9 @@ Bullet.prototype = Object.create(Phaser.Sprite.prototype);
 Bullet.prototype.constructor = Bullet;
 
 Bullet.prototype.fire = function (x, y, angle, speed, dir) {
-	
+
     this.reset(x, y);
-    
+
     this.body.velocity.x = speed * dir;
     this.scale.set(1);
 
@@ -44,18 +44,22 @@ Weapon.Basic = function (game, sprite) {
 	this.MAX_BULLETS = 100;
 	this.bullets = 100;
 
-    Phaser.Group.call(this, game, game.world, 'Basic', false, true, Phaser.Physics.ARCADE);
+  Phaser.Group.call(this, game, game.world, 'Basic', false, true, Phaser.Physics.ARCADE);
 
-    this.nextFire = 0;
-    this.bulletSpeed = 600;
-    this.fireRate = 200;
+  this.game = game;
 
-    for (var i = 0; i < 100; i++) {
-        this.add(new Bullet(game, sprite, 1), true);
-    }
+  this.nextFire = 0;
+  this.bulletSpeed = 600;
+  this.fireRate = 200;
 
-    return this;
+  for (var i = 0; i < 100; i++) {
+      this.add(new Bullet(game, sprite, 1), true);
+  }
 
+  this.throw_sound = this.game.add.sound('throw');
+  this.throw_sound.volume = 0.6;
+
+  return this;
 };
 
 Weapon.Basic.prototype = Object.create(Phaser.Group.prototype);
@@ -67,9 +71,11 @@ Weapon.Basic.prototype.fire = function (source, dir) {
 	var offset = 20 - (dir * 40);
     var x = source.x - offset;
     var y = source.y - 50;
-    
+
     if (this.bullets > 0) {
-		this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, dir);
+      this.throw_sound.play();
+
+  		this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, dir);
     	this.nextFire = this.game.time.time + this.fireRate;
     	this.bullets--;
     }
@@ -88,12 +94,16 @@ Weapon.Cannon = function (game, sprite) {
     this.bulletSpeed = 400;
     this.fireRate = 500;
 
+    this.game = game;
+
     for (var i = 0; i < 100; i++) {
         this.add(new Bullet(game, sprite, 3), true);
     }
 
-    return this;
+    this.throw_sound = this.game.add.sound('throw');
+    this.throw_sound.volume = 0.6;
 
+    return this;
 };
 
 Weapon.Cannon.prototype = Object.create(Phaser.Group.prototype);
@@ -108,7 +118,9 @@ Weapon.Cannon.prototype.fire = function (source, dir) {
     var y = source.y - 50;
 
     if (this.bullets > 0) {
-		this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, dir);
+      this.throw_sound.play();
+
+  		this.getFirstExists(false).fire(x, y, 0, this.bulletSpeed, dir);
     	this.nextFire = this.game.time.time + this.fireRate;
     	this.bullets--;
     }

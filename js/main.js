@@ -395,7 +395,8 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 
 		checkGameOver : function() {
 			if (this.player.HP < 1) {
-				this.restartLevel();
+				this.game.sound.mute = true;
+				this.game.state.start('gameOver');
 			}
 		},
 
@@ -865,6 +866,23 @@ game.state.add('tutorials', {
 
 		this.game.state.add('0', getState(0, [100, 10], [6, 6], 0));
 		this.game.state.start('0');
+	}
+});
+
+game.state.add('gameOver', {
+	create: function() {
+		var style = { font: 'bold 60px Arial', fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 850 };
+		this.game_over = this.game.add.text(this.game.world.width/2, this.game.world.height/2 - 50, 'Game Over!', style);
+		this.game_over.anchor.setTo(0.5, 0.5);
+		this.game_over.setShadow(1, 1, '#000000', 5);
+
+		this.restart = this.game.add.image(this.game.world.width/2, this.game.world.height/2 + 70, 'replay');
+		this.restart.anchor.setTo(0.5, 0.5);
+		this.restart.inputEnabled = true;
+		this.restart.events.onInputDown.add(this.startGame, this);
+	},
+	startGame: function() {
+		this.game.state.start('tutorials');
 	}
 });
 

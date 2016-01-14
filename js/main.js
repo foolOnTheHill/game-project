@@ -17,7 +17,7 @@ var girl = false;
 
 function getState(starsCount, currentBullets, currentHP, currentLevel) {
 
-	var levels = [level, bossLevel];
+	var levels = levels_list;
 
 	var main = {
 		create : function() {
@@ -57,9 +57,11 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 			this.bombs = this.game.add.group();
 			this.bombs.createMultiple(1000, 'bomb');
 
+			this.game.bombs = this.bombs;
+
 			// ENEMIES
 			this.enemies = this.game.add.group();
-			
+
 			//ITEMS
 			this.items = this.game.add.group();
 
@@ -275,7 +277,7 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 
 			this.game.physics.arcade.collide(this.stars, this.platforms);
 			this.game.physics.arcade.collide(this.stars, this.floor);
-			
+
 			this.game.physics.arcade.collide(this.items, this.platforms);
 			this.game.physics.arcade.collide(this.items, this.floor);
 
@@ -394,7 +396,7 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 				this.restartLevel();
 			}
 		},
-		
+
 		pickItem : function(player, item) {
 			if (item.type == 'first aid') {
 				this.player.recover(2);
@@ -422,15 +424,15 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 
 			this.player.stars = starsCount;
 			this.player.updateStars();
-			
+
 			this.player.weapon1.bullets = currentBullets[0];
 			this.player.weapon2.bullets = currentBullets[1];
 			this.player.updateBullets();
-		
+
 			for (var i = 0; i < (currentHP[1] - 6) / 2; i++) {
 				this.player.upgradeHP();
 			}
-			
+
 			this.player.HP = currentHP[0];
 			this.player.updateHearts();
 
@@ -446,7 +448,7 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 			this.loadPlatforms(level.platformsList);
 
 			this.loadEnemies(level.enemiesList);
-			
+
 			this.loadItems(level.itensList);
 
 			if (level.enemiesList.hasOwnProperty('boss')) {
@@ -474,7 +476,7 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 			this.platforms.forEachAlive(function(p) {
 				p.kill();
 			});
-		
+
 			for(var i = 0; i < platformsList.length; i++) {
 				var plt = platformsList[i];
 				var p = this.platforms.getFirstDead();
@@ -511,7 +513,7 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 				this.enemies.add(new EnemyFlyer(w.x, w.y, this.game, w.sprite, w.hp, w.isDropper, w.dropPeriod, w.leftAnimation, w.rightAnimation, w.lhitAnimation, w.rhitAnimation));
 			}
 		},
-		
+
 		loadItems: function(itemList) {
 			for (var i = 0; itemList != undefined && i <  itemList.length; i++) {
 				var w = itemList[i];
@@ -522,8 +524,6 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 				} else {
 					this.items.add(new ItemType(w.x, w.y, this.game, w.type, 'items'));
 				}
-				
-				
 			}
 		},
 
@@ -602,8 +602,8 @@ game.state.add('load', {
 		this.game.load.spritesheet('bullet2', 'assets/bullets/Balls30x30.png', 30, 30);
 		this.game.load.spritesheet('bomb', 'assets/bullets/Bombs60x35.png', 35, 60);
 		this.game.load.spritesheet('bulletEnemy', 'assets/bullets/TickShot15x15.png', 15, 15);
-		
-		
+
+
 		//EFFECT
 		this.game.load.spritesheet('explosion', 'assets/effects/explosion.png', 64, 64);
 
@@ -693,7 +693,7 @@ game.state.add('createPlayer', {
 
 		this.addBoyOrGirl();
 	},
-	
+
 	playStory: function() {
 		if (!this.storyText) {
 			var style = { font: 'bold 60px Arial', fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 850 };
@@ -714,7 +714,7 @@ game.state.add('createPlayer', {
 			this.currentText += 1;
 		}
 	},
-	
+
 	addLucas: function() {
 		this.lucas = this.game.add.image(this.game.world.width/2 + 500, this.game.world.height/2, 'Lucas');
 		this.lucas.anchor.setTo(0.5, 0.5);
@@ -724,7 +724,7 @@ game.state.add('createPlayer', {
 
 		this.playStory();
 	},
-	
+
 	addBoyOrGirl: function() {
 		this.question = this.game.add.text(this.game.world.width/2, 80, 'Are you a boy or a girl?', {
 			font : '70px "Arial"',
@@ -755,7 +755,7 @@ game.state.add('createPlayer', {
 			this.girlSelected = true;
 		}, this);
 	},
-	
+
 	update: function() {
 		if ((this.boySelected || this.girlSelected) && !this.story && !this.storyCompleted) {
 			this.question.destroy();
@@ -766,7 +766,7 @@ game.state.add('createPlayer', {
 			this.startGame();
 		}
 	},
-	
+
 	startGame: function() {
 		boy = this.boy;
 		girl = this.girl;
@@ -817,7 +817,7 @@ game.state.add('tutorials', {
 			}
 		}, this);
 	},
-	
+
 	startGame: function() {
 		this.game.state.add('0', getState(0, [100, 10], [6, 6], 0));
 		this.game.state.start('0');

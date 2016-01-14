@@ -8,7 +8,7 @@ var EnemyWalker = function(x, y, game, sprite, hp) {
 	this.animations.add('left', [0, 1, 2, 3, 4], 8, true);
 	this.animations.add('right', [7, 8, 9, 10, 11], 8, true);
 	this.animations.add('lhit', [14], 8, false);
-	this.animations.add('rhit', [24], 8, false);
+	this.animations.add('rhit', [23], 8, false);
 
 	this.animations.play("right");
 	this.direction = 'right';
@@ -26,7 +26,7 @@ EnemyWalker.prototype.update = function() {
 	if (this.game.physics.arcade.isPaused) {
 		this.animations.stop();
 	}
-	
+
 	this.move();
 };
 

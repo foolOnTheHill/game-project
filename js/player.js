@@ -82,14 +82,13 @@ Player.prototype.update = function() {
 
 	if (this.tookHit) {
 		if (this.game.time.now >= this.hitFlashTime) {
-			this.tint = 0xffffff;
+				this.tint = 0xffffff;
 			this.tookHit = false;
 		}
 	}
 
 	//Debug Stats
 	console.log("HP: " + this.HP + "/" + this.MAX_HP + " Attack: " + this.attack + " Defense: " + this.defense + " Speed: " + this.speed);
-
 };
 
 Player.prototype.damage = function(value) {
@@ -109,7 +108,6 @@ Player.prototype.damage = function(value) {
 		//console.log(this.hp);
 		//this.timer = this.game.time.events.add(Phaser.Timer.SECOND * 4, this.testPU, this);
 		//this.timer.pause();
-
 	}
 
 };

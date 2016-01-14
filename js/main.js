@@ -21,6 +21,9 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 
 	var main = {
 		create : function() {
+			// SOUND
+			this.game.sound.mute = false;
+
 			//SETTINGS
 			this.game.world.setBounds(0, 0, width * scale, height * scale);
 			this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -126,6 +129,9 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 		},
 
 		restartLevel: function() {
+			if (this.player.low_hp.isPlaying) {
+				this.player.low_hp.stop();
+			}
 			this.game.state.restart();
 		},
 
@@ -395,6 +401,9 @@ function getState(starsCount, currentBullets, currentHP, currentLevel) {
 
 		checkGameOver : function() {
 			if (this.player.HP < 1) {
+				if (this.player.low_hp.isPlaying) {
+					this.player.low_hp.stop();
+				}
 				this.game.sound.mute = true;
 				this.game.state.start('gameOver');
 			}
